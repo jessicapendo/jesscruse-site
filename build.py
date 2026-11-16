@@ -186,6 +186,60 @@ def listen_html(items):
     return "".join(out)
 
 
+def youtube_id(url):
+    m = re.search(r"(?:v=|youtu\.be/|/embed/|/shorts/)([A-Za-z0-9_-]{6,})", url or "")
+    return m.group(1) if m else ""
+
+
+def audio_html(items, root):
+    out = []
+    for item in items:
+        src = item.get("file") or ""
+        if not src:
+            continue
+        if not src.startswith("http"):
+            src = root + src.lstrip("/")
+        tag = "video" if src.lower().endswith((".mp4", ".mov", ".webm")) else "audio"
+        extra = ' style="width: 100%; border-radius: 16px"' if tag == "video" else ' style="width: 100%"'
+        out.append(
+            '<div style="background: #3D3954; border-radius: 28px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px">\n'
+            '<span style="font-size: 19px; font-weight: 800">%s</span>\n'
+            '<%s controls preload="none" src="%s"%s></%s>\n'
+            "</div>\n" % (esc(item.get("title")), tag, esc(src), extra, tag)
+        )
+    return "".join(out)
+
+
+def media_html(videos):
+    cards = []
+    for v in videos:
+        vid = youtube_id(v.get("url"))
+        if not vid:
+            continue
+        cards.append(
+            '<figure style="margin: 0; display: flex; flex-direction: column; gap: 12px">\n'
+            '<div style="position: relative; padding-top: 56.25%%; border-radius: 28px; overflow: hidden; background: #14121D">'
+            '<iframe src="https://www.youtube-nocookie.com/embed/%s" title="%s" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture; web-share" allowfullscreen style="position: absolute; left: 0; top: 0; width: 100%%; height: 100%%; border: 0"></iframe></div>\n'
+            '<figcaption style="font-size: 19px; font-weight: 800">%s</figcaption>\n'
+            "</figure>\n" % (vid, esc(v.get("title")), esc(v.get("title")))
+        )
+    if not cards:
+        return ""
+    return '<div style="flex: 1 1 100%%; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%%), 1fr)); gap: 24px">\n%s</div>\n' % "".join(cards)
+
+
+def excerpt_html(text):
+    if not (text or "").strip():
+        return ""
+    paras = "".join('<p style="margin: 0">%s</p>\n' % esc(p.strip()) for p in re.split(r"\n\s*\n", text) if p.strip())
+    return (
+        '<section style="max-width: 760px; margin: 0 auto; padding: 96px 32px 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">\n'
+        '<p style="margin: 0; font-size: 14px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase">Read an excerpt</p>\n'
+        '<div style="position: relative; background: #FFFFFF; border: 3px solid #2D2A3E; border-radius: 36px; padding: 48px 40px; box-shadow: 10px 12px 0 #FFCE00; display: flex; flex-direction: column; gap: 22px; font-size: 21px; line-height: 1.7">\n%s</div>\n'
+        "</section>\n" % paras
+    )
+
+
 def about_html(about):
     out = ['<p style="margin: 0">%s</p>\n' % esc(p) for p in about.get("paragraphs", []) if p]
     if about.get("highlight"):
@@ -244,7 +298,9 @@ def main():
     home = read("templates/home.html")
     home = home.replace("[[GALLERY]]", gallery_html(site.get("gallery", {}).get("items", []), ""))
     home = home.replace("[[POSTS]]", cards)
-    home = home.replace("[[LISTEN]]", listen_html(site.get("listen", {}).get("items", [])))
+    listen = site.get("listen", {})
+    home = home.replace("[[LISTEN]]", listen_html(listen.get("items", [])) + audio_html(listen.get("audio", []), ""))
+    home = home.replace("[[MEDIA]]", media_html(listen.get("videos", [])))
     home = home.replace("[[ABOUT]]", about_html(site.get("about", {})))
     home = home.replace("[[SUBSTACK_LINK]]", more)
     home = fill(home, site, "")
@@ -260,6 +316,10 @@ def main():
         canonical = "%s/blog/%s/" % (base, p["slug"]) if base else ""
         write("blog/%s/index.html" % p["slug"], page(p["title"] + " | Jess Cruse", p["summary"], body, "../../", canonical))
 
+    book = read("templates/book.html").replace("[[EXCERPT]]", excerpt_html(site.get("book", {}).get("excerpt", "")))
+    book = fill(book, site, "../")
+    write("book/index.html", page("A Book About Voice | Jess Cruse", site.get("book", {}).get("blurb", ""), book, "../", base + "/book/" if base else ""))
+
     privacy = fill(read("templates/privacy.html"), site, "../")
     write("privacy/index.html", page("Privacy | Jess Cruse", "How this site handles your information.", privacy, "../"))
 
@@ -270,7 +330,7 @@ def main():
         urls = [base + "/"] + ["%s/blog/%s/" % (base, p["slug"]) for p in posts]
         write("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % "".join("<url><loc>%s</loc></url>\n" % esc(u) for u in urls))
         write("robots.txt", "User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n" % base)
-    print("Built %d pages into dist/" % (2 + len(posts)))
+    print("Built %d pages into dist/" % (3 + len(posts)))
 
 
 if __name__ == "__main__":

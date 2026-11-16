@@ -42,7 +42,11 @@
     "substack_publication": ""
   },
   "book": {
-    "blurb": "A practical and honest book about voice confidence. I'm writing it now."
+    "blurb": "A practical and honest book about voice confidence. I'm writing it now.",
+    "release": "Coming in 2027",
+    "excerpt": "",
+    "hubspot_portal_id": "",
+    "hubspot_form_id": ""
   },
   "listen": {
     "heading": "Some of my thoughts on voice",
@@ -52,18 +56,19 @@
         "title": "Listen on Spotify",
         "kind": "Podcast episode",
         "url": "https://open.spotify.com/episode/2pt8QZZfXwUC2aNyeN9gVR"
-      },
+      }
+    ],
+    "videos": [
       {
-        "title": "Watch the podcast interview",
-        "kind": "YouTube",
+        "title": "Podcast interview",
         "url": "https://www.youtube.com/watch?v=7lrwWfa26EU"
       },
       {
-        "title": "Watch the radio interview",
-        "kind": "YouTube",
+        "title": "Radio interview",
         "url": "https://www.youtube.com/watch?v=ePumzAAWHV8"
       }
-    ]
+    ],
+    "audio": []
   },
   "gallery": {
     "heading": "The journey so far",

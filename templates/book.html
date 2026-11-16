@@ -1,0 +1,61 @@
+<div style="font-family: 'Nunito', sans-serif; color: #2D2A3E; background: #FFFFFF; min-height: 100vh">
+<header style="max-width: 1120px; margin: 0 auto; padding: 20px 32px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<a href="[[ROOT]]" style="font-size: 24px; font-weight: 900; text-decoration: none; display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 50%; background: #FFCE00; display: inline-block"></span>Jess Cruse</a>
+<a href="[[ROOT]]" style="font-size: 16px; font-weight: 800; padding: 12px 0">Back to home</a>
+</header>
+<main>
+<section style="position: relative; overflow: hidden; max-width: 1180px; margin: 0 auto; box-sizing: border-box; background: #FFF3C4; border-radius: 56px; padding: 80px 48px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 72px">
+<div aria-hidden="true" class="floaty2" style="position: absolute; right: -50px; top: -50px; width: 190px; height: 190px; border-radius: 50%; background: #FFB59A"></div>
+<div aria-hidden="true" class="floaty" style="position: absolute; left: -40px; bottom: -60px; width: 170px; height: 170px; border-radius: 48px; background: #D9CCFF; transform: rotate(18deg)"></div>
+<div class="floaty" style="position: relative; flex: 0 0 280px; height: 392px; border-radius: 8px 24px 24px 8px; background: #2D2A3E; color: #FFFFFF; box-sizing: border-box; padding: 38px 30px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 20px 24px 0 #F2DC8A">
+<span aria-hidden="true" style="width: 76px; height: 76px; border-radius: 50%; background: #FFCE00"></span>
+<span style="font-size: 40px; font-weight: 900; line-height: 1.08">A Book About Voice</span>
+<span style="font-size: 17px; font-weight: 700">Jess Cruse</span>
+</div>
+<div style="position: relative; flex: 1 1 360px; max-width: 520px; display: flex; flex-direction: column; gap: 18px; align-items: flex-start">
+<p style="margin: 0; font-size: 14px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; background: #2D2A3E; color: #FFFFFF; padding: 8px 16px; border-radius: 999px">[[book.release]]</p>
+<h1 style="margin: 0; font-size: clamp(36px, 4.6vw, 60px); line-height: 1.05; font-weight: 900">A Book About Voice</h1>
+<p style="margin: 0; font-size: 21px; line-height: 1.55">[[book.blurb]]</p>
+<a class="lift" href="#preorder" style="margin-top: 8px; background: #2D2A3E; color: #FFFFFF; text-decoration: none; font-weight: 800; font-size: 18px; padding: 18px 32px; border-radius: 999px; box-shadow: 0 6px 0 #14121D">Reserve my copy</a>
+</div>
+</section>
+[[EXCERPT]]
+<section id="preorder" style="max-width: 1180px; margin: 96px auto 0; box-sizing: border-box; background: #2D2A3E; color: #FFFFFF; border-radius: 56px; padding: 72px 32px; display: flex; flex-direction: column; align-items: center; gap: 12px">
+<p style="margin: 0; font-size: 14px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #FFCE00">Pre-order</p>
+<h2 style="margin: 0; font-size: clamp(32px, 4vw, 48px); line-height: 1.1; font-weight: 900; text-align: center">Reserve your copy</h2>
+<p style="margin: 0 0 24px; font-size: 19px; line-height: 1.55; text-align: center; max-width: 520px; color: #D9D6E8">No payment today. Tell me where to find you, and you'll be the first to hear when it's ready.</p>
+
+<form id="preorder-form" data-portal="[[book.hubspot_portal_id]]" data-form="[[book.hubspot_form_id]]" data-email="[[links.email]]" style="width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 20px">
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 16px; font-weight: 800">Your name
+<input name="firstname" type="text" required autocomplete="name" style="font: inherit; font-weight: 600; font-size: 18px; color: #2D2A3E; background: #FFFFFF; border: 0; border-radius: 20px; padding: 18px 22px"></label>
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 16px; font-weight: 800">Email
+<input name="email" type="email" required autocomplete="email" style="font: inherit; font-weight: 600; font-size: 18px; color: #2D2A3E; background: #FFFFFF; border: 0; border-radius: 20px; padding: 18px 22px"></label>
+<div style="display: flex; flex-wrap: wrap; gap: 20px">
+<label style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px; font-size: 16px; font-weight: 800">City
+<input name="city" type="text" autocomplete="address-level2" style="font: inherit; font-weight: 600; font-size: 18px; color: #2D2A3E; background: #FFFFFF; border: 0; border-radius: 20px; padding: 18px 22px"></label>
+<label style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px; font-size: 16px; font-weight: 800">Country
+<input name="country" type="text" required autocomplete="country-name" style="font: inherit; font-weight: 600; font-size: 18px; color: #2D2A3E; background: #FFFFFF; border: 0; border-radius: 20px; padding: 18px 22px"></label>
+</div>
+<fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<legend style="font-size: 16px; font-weight: 800; padding: 0 0 10px">How would you like to read it? Pick any.</legend>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
+<label class="choice" style="position: relative; cursor: pointer"><input type="checkbox" name="format" value="physical_copy" style="position: absolute; opacity: 0"><span style="display: block; text-align: center; font-size: 17px; font-weight: 800; background: #3D3954; border: 3px solid #3D3954; border-radius: 22px; padding: 20px 12px">Physical copy</span></label>
+<label class="choice" style="position: relative; cursor: pointer"><input type="checkbox" name="format" value="audiobook" style="position: absolute; opacity: 0"><span style="display: block; text-align: center; font-size: 17px; font-weight: 800; background: #3D3954; border: 3px solid #3D3954; border-radius: 22px; padding: 20px 12px">Audiobook</span></label>
+<label class="choice" style="position: relative; cursor: pointer"><input type="checkbox" name="format" value="pdf" style="position: absolute; opacity: 0"><span style="display: block; text-align: center; font-size: 17px; font-weight: 800; background: #3D3954; border: 3px solid #3D3954; border-radius: 22px; padding: 20px 12px">PDF</span></label>
+</div>
+</fieldset>
+<button type="submit" class="lift" style="margin-top: 8px; font: inherit; cursor: pointer; background: #FFCE00; color: #2D2A3E; border: 0; font-weight: 900; font-size: 19px; padding: 20px 32px; border-radius: 999px; box-shadow: 0 6px 0 #D9A900">Reserve my copy</button>
+<p id="preorder-error" role="alert" hidden style="margin: 0; font-size: 16px; font-weight: 700; color: #FFB59A"></p>
+<p style="margin: 0; font-size: 14px; line-height: 1.5; color: #D9D6E8; text-align: center">I'll only use your details to tell you about the book. <a href="[[ROOT]]privacy/" style="color: #D9D6E8">Privacy</a></p>
+</form>
+
+<div id="preorder-thanks" hidden tabindex="-1" style="max-width: 520px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center">
+<img src="[[ROOT]]assets/img/kim.png" alt="" style="width: 150px; height: 150px; object-fit: contain">
+<h3 style="margin: 0; font-size: 32px; font-weight: 900">You're on the list.</h3>
+<p style="margin: 0; font-size: 19px; line-height: 1.55; color: #D9D6E8">Thank you. I'll write to you as soon as A Book About Voice is ready.</p>
+<a href="[[ROOT]]" style="color: #FFCE00; font-size: 17px; font-weight: 800; padding: 12px">Back to home</a>
+</div>
+</section>
+<div style="height: 96px"></div>
+</main>
+</div>

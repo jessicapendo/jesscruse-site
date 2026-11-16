@@ -39,3 +39,6 @@ img{max-width:100%}
 button{font-family:inherit}
 a:focus-visible,button:focus-visible{outline:3px solid #5B2FC4;outline-offset:3px}
 @media (max-width:640px){#top,#book,#listen,#gallery{border-radius:32px !important;padding-left:20px !important;padding-right:20px !important}.polaroid{width:156px !important;padding:8px 8px 10px !important}.polaroid img{width:140px !important;height:140px !important}.polaroid figcaption{font-size:19px !important}}
+.choice input:checked + span{background:#FFCE00 !important;border-color:#FFCE00 !important;color:#2D2A3E}
+.choice input:focus-visible + span{outline:3px solid #FFFFFF;outline-offset:3px}
+input:focus-visible{outline:3px solid #FFCE00;outline-offset:2px}

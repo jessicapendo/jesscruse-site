@@ -58,6 +58,8 @@ content:
         type: object
         fields:
           - { name: blurb, label: Text about the book, type: text }
+          - { name: release, label: "Release label (for example Coming in 2027)", type: string }
+          - { name: excerpt, label: "Excerpt (leave a blank line between paragraphs; leave empty to hide)", type: text }
       - name: listen
         label: Thoughts on voice section
         type: object
@@ -72,6 +74,20 @@ content:
               - { name: title, label: Button text, type: string }
               - { name: kind, label: "Small label (Podcast, Video, Radio)", type: string }
               - { name: url, label: Link, type: string }
+          - name: videos
+            label: YouTube videos (they play on the page)
+            type: object
+            list: true
+            fields:
+              - { name: title, label: Title, type: string }
+              - { name: url, label: YouTube link, type: string }
+          - name: audio
+            label: Audio or short video files (mp3, m4a or mp4)
+            type: object
+            list: true
+            fields:
+              - { name: title, label: Title, type: string }
+              - { name: file, label: File, type: file }
       - name: gallery
         label: Gallery
         type: object
