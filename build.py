@@ -319,12 +319,12 @@ def page(title, description, body, root, canonical="", endpoint=None, kind="webs
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="%sassets/site.css?v=8">
+<link rel="stylesheet" href="%sassets/site.css?v=9">
 </head>
 <body data-endpoint="%s">
 <a class="skip" href="#main">Skip to content</a>
 %s
-<script src="%sassets/site.js?v=8" defer></script>
+<script src="%sassets/site.js?v=9" defer></script>
 </body>
 </html>
 """ % (esc(CSP), esc(title), esc(description), esc(title), esc(description), kind, esc(share), esc(title), esc(description), esc(share),

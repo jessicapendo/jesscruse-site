@@ -14,7 +14,7 @@ var TAB_ORDERS = 'Pre-orders';
 var TAB_ACTIVITY = 'Activity';
 var TAB_SETTINGS = 'Settings';
 var TAB_SUMMARY = 'Summary';
-var VERSION = '3';
+var VERSION = '4';
 var MAX_THANK_YOUS_PER_DAY = 60;
 
 var THANK_YOU = 'Heyyy you!\n\nThank you for showing interest in my book about voice. As I continue to write this, your interest motivates me to keep going.\n\nUntil then, here\'s what you can do:\n\n1. Leave this email knowing I think you\'re amazing.\n\n2. Get weekly voice confidence boosting tips to your email here: {tips}\n\n3. Follow me and my messy building in public, with some storytelling tips and more shares: https://instagram.com/livingstorieswithjess\n\n4. Step into the world of Voxa, where I built an app and other ways to help your voice: https://voxa.club\n\nOrrrr\n\nJust get in touch and say hey. Email me at jess@voxa.club or book a call: https://calendly.com/jess-voxa\n\nIt really does mean a lot.\n\nHere\'s one of my fave quotes to leave you with:\n\nSpeak,\neven if your voice shakes.\n\nUntil spring 2027.\n\nSee yaaaaaa\n\nJess';
@@ -170,11 +170,25 @@ function report_(days) {
   var since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   var period = days === 1 ? 'last 24 hours' : 'last ' + days + ' days';
 
-  var visits = 0, views = 0, clicks = {}, pages = {}, sources = {};
+  var before = new Date(since.getTime() - days * 24 * 60 * 60 * 1000);
+  var zone = Session.getScriptTimeZone();
+  var daily = {}, dayKeys = [], dayNames = [];
+  for (var n = 6; n >= 0; n--) {
+    var day = new Date(Date.now() - n * 24 * 60 * 60 * 1000);
+    var key = Utilities.formatDate(day, zone, 'yyyy-MM-dd');
+    dayKeys.push(key); dayNames.push(Utilities.formatDate(day, zone, 'EEE d')); daily[key] = 0;
+  }
+  var visits = 0, views = 0, clicks = {}, pages = {}, sources = {}, visitsBefore = 0;
   rows_(TAB_ACTIVITY).forEach(function (r) {
-    if (!(r[0] instanceof Date) || r[0] < since) return;
-    if (r[1] === 'Visit') { visits++; views++; bump_(sources, r[4] || 'Typed the address or unknown'); bump_(pages, r[3]); }
-    if (r[1] === 'Page view') { views++; bump_(pages, r[3]); }
+    if (!(r[0] instanceof Date)) return;
+    if (r[1] === 'Visit') {
+      var k = Utilities.formatDate(r[0], zone, 'yyyy-MM-dd');
+      if (k in daily) daily[k]++;
+      if (r[0] >= before && r[0] < since) visitsBefore++;
+    }
+    if (r[0] < since) return;
+    if (r[1] === 'Visit') { visits++; views++; bump_(sources, r[4] || 'Typed the address or unknown'); bump_(pages, pageName_(r[3])); }
+    if (r[1] === 'Page view') { views++; bump_(pages, pageName_(r[3])); }
     if (r[1] === 'Click') bump_(clicks, r[2]);
   });
 
@@ -201,10 +215,74 @@ function report_(days) {
     (orderLines.length ? 'New pre-orders\n' + orderLines.join('\n') + '\n\n' : '') +
     'Open the full sheet: ' + link;
 
+  var change = visitsBefore ? Math.round((visits - visitsBefore) / visitsBefore * 100) : null;
+  var trend = change === null ? 'First ' + (days === 1 ? 'day' : 'week') + ' of counting' : (change >= 0 ? 'Up ' : 'Down ') + Math.abs(change) + '% on the ' + (days === 1 ? 'day' : 'week') + ' before';
+  var picture = '<div style="font-family: Arial, Helvetica, sans-serif; color: #2D2A3E; max-width: 600px; margin: 0 auto">' +
+    '<div style="background: #FFF3C4; border-radius: 24px; padding: 28px 24px">' +
+    '<div style="font-size: 13px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase">jesscruse.com</div>' +
+    '<div style="font-size: 28px; font-weight: bold; margin-top: 6px">Your website, ' + period + '</div>' +
+    '<div style="font-size: 15px; margin-top: 6px">' + trend + '</div></div>' +
+    '<table role="presentation" cellspacing="8" cellpadding="0" style="width: 100%; margin-top: 8px"><tr>' +
+    tile_(visits, 'Visits', '#FFD9C7') + tile_(orders, 'Pre-orders', '#FFCE00') + tile_(clicks['Book a call'] || 0, 'Call clicks', '#D5F0DF') + tile_(clicks['Email Jess'] || 0, 'Email clicks', '#D6E8FF') +
+    '</tr></table>' +
+    '<div style="font-size: 14px; margin: 4px 8px 0">Pages viewed: <b>' + views + '</b> &nbsp;·&nbsp; Copies wanted: <b>' + copies + '</b> &nbsp;·&nbsp; Pre-orders all time: <b>' + total + '</b></div>' +
+    section_('Visits each day, last 7 days') + columns_(dayKeys.map(function (k) { return daily[k]; }), dayNames) +
+    section_('What people clicked') + bars_(clicks, '#5B2FC4') +
+    section_('Most viewed pages') + bars_(pages, '#FFCE00') +
+    section_('Where visitors came from') + bars_(sources, '#F2B49A') +
+    (orderLines.length ? section_('New pre-orders') + '<div style="font-size: 15px; line-height: 1.7; margin: 0 8px">' + orderLines.map(function (l) { return safe_(l.trim()); }).join('<br>') + '</div>' : '') +
+    '<div style="margin: 28px 8px 8px"><a href="' + link + '" style="background: #5B2FC4; color: #FFFFFF; text-decoration: none; font-weight: bold; font-size: 15px; padding: 14px 24px; border-radius: 999px; display: inline-block">Open my sheet</a></div></div>';
+
   if (s['Send alerts to']) {
-    MailApp.sendEmail({ to: s['Send alerts to'], subject: 'Your website, ' + period + ': ' + visits + ' visits, ' + orders + ' pre-orders', body: body });
+    MailApp.sendEmail({ to: s['Send alerts to'], subject: 'Your website, ' + period + ': ' + visits + ' visits, ' + orders + ' pre-orders', body: body, htmlBody: picture });
   }
   slack_(s, ':bar_chart: *Your website, ' + period + '*\n' + headline + '\n\n*Top clicks*\n' + (list_(clicks) || '  None yet') + '\n\n<' + link + '|Open the full sheet>');
+}
+
+function pageName_(path) {
+  path = String(path || '/');
+  if (path === '/') return 'Home page';
+  if (path === '/book/') return 'Book page';
+  if (path === '/privacy/') return 'Privacy page';
+  var article = path.match(/^\/blog\/([^\/]+)\/?$/);
+  if (article) return 'Article: ' + article[1].replace(/-/g, ' ');
+  return path;
+}
+
+function safe_(text) { return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+function tile_(number, label, colour) {
+  return '<td style="background: ' + colour + '; border-radius: 20px; padding: 18px 8px; text-align: center; width: 25%">' +
+    '<div style="font-size: 30px; font-weight: bold">' + number + '</div><div style="font-size: 12px; font-weight: bold; margin-top: 4px">' + label + '</div></td>';
+}
+
+function section_(title) {
+  return '<div style="font-size: 17px; font-weight: bold; margin: 28px 8px 10px">' + title + '</div>';
+}
+
+/** Horizontal bars, biggest first. */
+function bars_(map, colour) {
+  var keys = Object.keys(map).sort(function (a, b) { return map[b] - map[a]; }).slice(0, 8);
+  if (!keys.length) return '<div style="font-size: 14px; margin: 0 8px; color: #6B6880">Nothing yet.</div>';
+  var top = map[keys[0]] || 1;
+  return '<table role="presentation" cellspacing="0" cellpadding="0" style="width: 100%">' + keys.map(function (k) {
+    var width = Math.max(4, Math.round(map[k] / top * 100));
+    return '<tr><td style="font-size: 14px; padding: 5px 8px; width: 42%">' + safe_(k) + '</td>' +
+      '<td style="padding: 5px 0"><div style="background: ' + colour + '; height: 16px; border-radius: 8px; width: ' + width + '%"></div></td>' +
+      '<td style="font-size: 14px; font-weight: bold; padding: 5px 8px; width: 12%; text-align: right">' + map[k] + '</td></tr>';
+  }).join('') + '</table>';
+}
+
+/** Upright bars, one per day. */
+function columns_(values, labels) {
+  var top = Math.max.apply(null, values.concat([1]));
+  return '<table role="presentation" cellspacing="6" cellpadding="0" style="width: 100%"><tr>' + values.map(function (v) {
+    var height = Math.max(4, Math.round(v / top * 110));
+    return '<td style="vertical-align: bottom; text-align: center; height: 140px"><div style="font-size: 13px; font-weight: bold">' + v + '</div>' +
+      '<div style="background: #FFCE00; border-radius: 8px 8px 0 0; height: ' + height + 'px; margin-top: 4px"></div></td>';
+  }).join('') + '</tr><tr>' + labels.map(function (l) {
+    return '<td style="font-size: 11px; text-align: center; color: #6B6880">' + l + '</td>';
+  }).join('') + '</tr></table>';
 }
 
 function bump_(map, key) { key = key || 'Unknown'; map[key] = (map[key] || 0) + 1; }
@@ -298,6 +376,24 @@ function summary_() {
   sheet.setColumnWidth(1, 280);
   sheet.setColumnWidth(2, 140);
   sheet.setFrozenRows(1);
+
+  // Chart data: visits for each of the last 14 days, and clicks by button.
+  try {
+    sheet.getCharts().forEach(function (c) { sheet.removeChart(c); });
+    var days = [['Day', 'Visits']];
+    for (var i = 13; i >= 0; i--) {
+      days.push(['=TODAY()-' + i, '=COUNTIFS(Activity!B2:B,"Visit",Activity!A2:A,">="&(TODAY()-' + i + '),Activity!A2:A,"<"&(TODAY()-' + (i - 1) + '))']);
+    }
+    sheet.getRange(1, 12, days.length, 2).setValues(days);
+    sheet.getRange(2, 12, 14, 1).setNumberFormat('d mmm');
+    sheet.getRange(1, 15).setFormula('=IFERROR(QUERY(Activity!B2:C,"select C, count(B) where B = \'Click\' group by C order by count(B) desc limit 10 label C \'Button\', count(B) \'Clicks\'",0),"No clicks yet")');
+    sheet.insertChart(sheet.newChart().setChartType(Charts.ChartType.COLUMN).addRange(sheet.getRange(1, 12, 15, 2))
+      .setPosition(2, 4, 0, 0).setOption('title', 'Visits each day, last 14 days').setOption('legend', { position: 'none' })
+      .setOption('colors', ['#FFCE00']).setOption('width', 620).setOption('height', 300).build());
+    sheet.insertChart(sheet.newChart().setChartType(Charts.ChartType.BAR).addRange(sheet.getRange(1, 15, 11, 2))
+      .setPosition(18, 4, 0, 0).setOption('title', 'What people clicked, all time').setOption('legend', { position: 'none' })
+      .setOption('colors', ['#5B2FC4']).setOption('width', 620).setOption('height', 320).build());
+  } catch (err) {}
 }
 
 /** Run this once by hand after pasting the code. It creates the tabs and the morning report. */

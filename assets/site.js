@@ -169,6 +169,12 @@
 (function () {
   var endpoint = document.body.getAttribute('data-endpoint');
   if (!endpoint) return;
+  // The owner can open the site once with ?me at the end of the address so her own visits are not counted on that device.
+  try {
+    if (/[?&]me\b/.test(window.location.search)) { window.localStorage.setItem('owner', '1'); window.alert('Done. Your own visits on this device will no longer be counted.'); }
+    if (/[?&]countme\b/.test(window.location.search)) window.localStorage.removeItem('owner');
+    if (window.localStorage.getItem('owner') === '1') return;
+  } catch (e) {}
   var page = window.location.pathname.replace(/\/index\.html$/, '/') || '/';
 
   function send(type, label, source) {
