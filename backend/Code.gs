@@ -18,8 +18,8 @@ var MAX_THANK_YOUS_PER_DAY = 60;
 var DEFAULT_SETTINGS = [
   ['Send alerts to', 'jess@voxa.club'],
   ['Send thank-you emails (yes or no)', 'yes'],
-  ['Thank-you subject', 'Thank you for pre-ordering A Book About Voice'],
-  ['Thank-you message', 'Hi {name},\n\nThank you for pre-ordering A Book About Voice. It means a lot that you want to read it.\n\nI am writing it now, and it is coming in 2027. You do not need to pay anything today. I will email you as soon as it is ready, with everything you need.\n\nUntil then, keep using your voice.\n\nJess'],
+  ['Thank-you subject', 'Thank you (and a little something from me)'],
+  ['Thank-you message', 'Heyyy you!\n\nThank you for showing interest in my book about voice. As I continue to write this, your interest motivates me to keep going.\n\nUntil then, here\'s what you can do:\n\n1. Leave this email knowing I think you\'re amazing.\n\n2. Follow me and my messy building in public, with some storytelling tips and more shares: https://instagram.com/livingstorieswithjess\n\n3. Step into the world of Voxa, where I built an app and other ways to help your voice: https://voxa.club\n\nOrrrr\n\nJust get in touch and say hey. Email me at jess@voxa.club or book a call: https://calendly.com/jess-voxa\n\nIt really does mean a lot.\n\nHere\'s one of my fave quotes to leave you with:\n\nSpeak,\neven if your voice shakes.\n\nUntil spring 2027.\n\nSee yaaaaaa\n\nJess'],
   ['Weekly summary (yes or no)', 'yes']
 ];
 
@@ -80,12 +80,14 @@ function savePreorder_(data) {
   }
 
   if (isYes_(s['Send thank-you emails (yes or no)']) && underDailyLimit_()) {
+    var message = String(s['Thank-you message']).replace(/\{name\}/g, name.replace(/^'/, '').split(' ')[0]);
     MailApp.sendEmail({
       to: email,
       replyTo: owner || undefined,
       name: 'Jess Cruse',
       subject: s['Thank-you subject'],
-      body: String(s['Thank-you message']).replace(/\{name\}/g, name.split(' ')[0])
+      body: message,
+      htmlBody: html_(message)
     });
   }
 }
@@ -224,6 +226,14 @@ function settings_() {
 }
 
 function isYes_(value) { return String(value).trim().toLowerCase().indexOf('y') === 0; }
+
+/** Turn the plain message into a simple email with tappable links. */
+function html_(text) {
+  var safe = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  safe = safe.replace(/(https?:\/\/[^\s<]+[^\s<.,!?)])/g, '<a href="$1">$1</a>');
+  safe = safe.replace(/([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/g, '<a href="mailto:$1">$1</a>');
+  return '<div style="font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #2D2A3E">' + safe.replace(/\n/g, '<br>') + '</div>';
+}
 
 /** Trim, cap the length, and stop anything being read as a spreadsheet formula. */
 function clean_(value, max) {
