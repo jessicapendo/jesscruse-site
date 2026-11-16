@@ -57,7 +57,7 @@ def fill(template, data, root):
     def lookup(match):
         section, key = match.group(1), match.group(2)
         return esc(data.get(section, {}).get(key, ""))
-    out = re.sub(r"\[\[([a-z]+)\.([a-z_]+)\]\]", lookup, template)
+    out = re.sub(r"\[\[([a-z]+)\.([a-z0-9_]+)\]\]", lookup, template)
     return out.replace("[[ROOT]]", root)
 
 
