@@ -263,11 +263,11 @@ def page(title, description, body, root, canonical=""):
 %s<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="%sassets/site.css">
+<link rel="stylesheet" href="%sassets/site.css?v=3">
 </head>
 <body>
 %s
-<script src="%sassets/site.js" defer></script>
+<script src="%sassets/site.js?v=3" defer></script>
 </body>
 </html>
 """ % (esc(title), esc(description), esc(title), esc(description), root, head_extra, root, body, root)

@@ -75,11 +75,13 @@
           Copies: data.get('copies')
         })
       }).then(function (response) {
-        if (!response.ok) throw new Error('status ' + response.status);
-        done();
-      }).catch(function () {
+        return response.json().catch(function () { return {}; }).then(function (body) {
+          if (!response.ok || body.success === false) throw new Error(body.message || ('status ' + response.status));
+          done();
+        });
+      }).catch(function (err) {
         btn.disabled = false;
-        error.textContent = 'Sorry, that did not send. Please try again, or email ' + owner + '.';
+        error.textContent = 'Sorry, that did not send. Please try again, or email ' + owner + '. (' + (err && err.message ? err.message : 'no connection') + ')';
         error.hidden = false;
       });
       return;
