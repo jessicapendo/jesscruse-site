@@ -19,13 +19,17 @@
     "read_lead": "Keep",
     "read_bold": "reading",
     "book_lead": "Dive",
-    "book_bold": "deeper"
+    "book_bold": "deeper",
+    "speak_lead": "Speak",
+    "speak_bold": "here"
   },
   "popups": {
     "me_title": "Ready to improve your voice confidence?",
     "me_text": "You can book a discovery call with me here.",
     "team_title": "Improve your team's communication skills.",
-    "team_text": "Tell me about your people, or book a call and we'll talk it through."
+    "team_text": "Tell me about your people, or book a call and we'll talk it through.",
+    "speak_title": "Book Jess as your next speaker or speaking guest.",
+    "speak_text": "Stages, panels, podcasts and workshops."
   },
   "links": {
     "voxa": "https://voxa.club",

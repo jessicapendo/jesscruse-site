@@ -16,7 +16,7 @@ content:
           - { name: subtitle, label: Line under the headline, type: text }
           - { name: photo, label: Your photo in the sun, type: image }
       - name: tiles
-        label: The five big buttons
+        label: The six big buttons
         type: object
         fields:
           - { name: me_lead, label: "Button 1, normal words", type: string }
@@ -29,6 +29,8 @@ content:
           - { name: read_bold, label: "Button 4, bold words", type: string }
           - { name: book_lead, label: "Button 5, normal words", type: string }
           - { name: book_bold, label: "Button 5, bold words", type: string }
+          - { name: speak_lead, label: "Button 6, normal words", type: string }
+          - { name: speak_bold, label: "Button 6, bold words", type: string }
       - name: popups
         label: Pop-up messages
         type: object
@@ -37,6 +39,8 @@ content:
           - { name: me_text, label: "Help me pop-up, text", type: text }
           - { name: team_title, label: "Help my team pop-up, headline", type: string }
           - { name: team_text, label: "Help my team pop-up, text", type: text }
+          - { name: speak_title, label: "Speak here pop-up, headline", type: string }
+          - { name: speak_text, label: "Speak here pop-up, text", type: text }
       - name: links
         label: Links
         type: object
