@@ -124,3 +124,14 @@
     });
   });
 })();
+
+/* Open links to other websites in a new tab */
+(function () {
+  var links = document.querySelectorAll('a[href^="http"]');
+  for (var i = 0; i < links.length; i++) {
+    if (links[i].hostname && links[i].hostname !== window.location.hostname) {
+      links[i].target = '_blank';
+      links[i].rel = 'noopener';
+    }
+  }
+})();
