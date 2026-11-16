@@ -1,0 +1,10 @@
+{
+  "automation": {
+    "endpoint": "https://script.google.com/macros/s/AKfycbzhiVaAcIFXuaTUkHHP9Tu6P6ZlwIJRlDC6Y3KYtad9K9AgDGQbQ-em_IgFHMg74y-d9g/exec"
+  },
+  "book": {
+    "web3forms_key": "97d942c5-572f-4543-8209-16f159add66a",
+    "hubspot_portal_id": "",
+    "hubspot_form_id": ""
+  }
+}

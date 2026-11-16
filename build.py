@@ -357,6 +357,11 @@ def check(site):
 
 def main():
     site = json.loads(read("content/site.json"))
+    # Technical connections live in their own file so the edit screen can never remove them.
+    for section, values in json.loads(read("content/connections.json")).items():
+        for key, value in values.items():
+            if not site.setdefault(section, {}).get(key):
+                site[section][key] = value
     global ENDPOINT, BASE
     ENDPOINT = (site.get("automation", {}).get("endpoint", "") or "").strip()
     seo, links = site.get("seo", {}), site.get("links", {})
