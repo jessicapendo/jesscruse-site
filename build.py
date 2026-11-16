@@ -7,6 +7,7 @@ Run:  python3 build.py
 import glob
 import html
 import json
+import time
 import os
 import re
 import shutil
@@ -31,6 +32,10 @@ ROW_COLOURS = ["#FFCE00", "#FF7A50", "#BFE8D4"]
 
 def esc(text):
     return html.escape(str(text or ""), quote=True)
+
+
+def read_abs(path):
+    return open(path, encoding="utf-8").read()
 
 
 def read(path):
@@ -220,8 +225,8 @@ def media_html(videos):
             '<figure style="margin: 0; display: flex; flex-direction: column; gap: 12px">\n'
             '<div style="position: relative; padding-top: 56.25%%; border-radius: 28px; overflow: hidden; background: #14121D">'
             '<iframe src="https://www.youtube-nocookie.com/embed/%s" title="%s" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture; web-share" allowfullscreen style="position: absolute; left: 0; top: 0; width: 100%%; height: 100%%; border: 0"></iframe></div>\n'
-            '<figcaption style="font-size: 19px; font-weight: 800">%s</figcaption>\n'
-            "</figure>\n" % (vid, esc(v.get("title")), esc(v.get("title")))
+            '<figcaption style="font-size: 19px; font-weight: 800; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px">%s <a href="https://www.youtube.com/watch?v=%s" style="color: #FFCE00; font-size: 16px">Watch on YouTube</a></figcaption>\n'
+            "</figure>\n" % (vid, esc(v.get("title")), esc(v.get("title")), vid)
         )
     if not cards:
         return ""
@@ -248,46 +253,128 @@ def about_html(about):
 
 
 ENDPOINT = ""
+BASE = ""
+
+CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+       "font-src https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self' https:; "
+       "frame-src https://www.youtube-nocookie.com; "
+       "connect-src 'self' https://api.web3forms.com https://script.google.com https://script.googleusercontent.com https://api.hsforms.com; "
+       "form-action 'self' https://api.web3forms.com; base-uri 'self'; object-src 'none'")
 
 
-def page(title, description, body, root, canonical="", endpoint=None):
-    def lazy(m):
+def page(title, description, body, root, canonical="", endpoint=None, kind="website", data=None, index=True):
+    def tidy(m):
         tag = m.group(0)
-        if "jess-radio" in tag or "loading=" in tag:
-            return tag.replace("<img ", '<img fetchpriority="high" ', 1) if "jess-radio" in tag else tag
+        if not re.search(r"\swidth=", tag):
+            size = re.search(r"width: (\d+)px; height: (\d+)px", tag)
+            if size:
+                tag = tag.replace("<img ", '<img width="%s" height="%s" ' % size.groups(), 1)
+        if "jess-radio" in tag:
+            return tag.replace("<img ", '<img fetchpriority="high" ', 1)
+        if "loading=" in tag:
+            return tag
         return tag.replace("<img ", '<img loading="lazy" decoding="async" ', 1)
-    body = re.sub(r"<img [^>]*>", lazy, body)
-    head_extra = '<link rel="canonical" href="%s">\n' % esc(canonical) if canonical else ""
+    body = re.sub(r"<img [^>]*>", tidy, body)
+    share = (BASE + "/assets/img/share.jpg") if BASE else root + "assets/img/share.jpg"
+    extra = []
+    if canonical:
+        extra.append('<link rel="canonical" href="%s">' % esc(canonical))
+        extra.append('<meta property="og:url" content="%s">' % esc(canonical))
+    if not index:
+        extra.append('<meta name="robots" content="noindex">')
+    if "jess-radio" in body:
+        extra.append('<link rel="preload" as="image" href="%sassets/img/jess-radio.jpg">' % root)
+    for block in (data or []):
+        extra.append('<script type="application/ld+json">%s</script>' % json.dumps(block, ensure_ascii=False).replace("</", "<\\/"))
     return """<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="%s">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>%s</title>
 <meta name="description" content="%s">
+<meta name="author" content="Jess Cruse">
+<meta name="theme-color" content="#FFF3C4">
+<meta property="og:site_name" content="Jess Cruse">
+<meta property="og:locale" content="en_GB">
 <meta property="og:title" content="%s">
 <meta property="og:description" content="%s">
-<meta property="og:type" content="website">
-<meta property="og:image" content="%sassets/img/jess-radio.jpg">
-%s<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta property="og:type" content="%s">
+<meta property="og:image" content="%s">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Jess Cruse smiling at a radio studio microphone, beside the words: I don't know you, but I know your voice matters.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="%s">
+<meta name="twitter:description" content="%s">
+<meta name="twitter:image" content="%s">
+<link rel="icon" href="%sassets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="%sassets/img/touch-icon.png">
+%s
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="%sassets/site.css?v=6">
+<link rel="stylesheet" href="%sassets/site.css?v=7">
 </head>
 <body data-endpoint="%s">
+<a class="skip" href="#main">Skip to content</a>
 %s
-<script src="%sassets/site.js?v=6" defer></script>
+<script src="%sassets/site.js?v=7" defer></script>
 </body>
 </html>
-""" % (esc(title), esc(description), esc(title), esc(description), root, head_extra, root, esc(ENDPOINT if endpoint is None else endpoint), body, root)
+""" % (esc(CSP), esc(title), esc(description), esc(title), esc(description), kind, esc(share), esc(title), esc(description), esc(share),
+       root, root, "\n".join(extra), root, esc(ENDPOINT if endpoint is None else endpoint), body, root)
+
+
+def check(site):
+    """Stop the publish (the live site stays as it was) if an edit would break something."""
+    problems = []
+    for key, url in site.get("links", {}).items():
+        if key == "email":
+            if url and not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", url):
+                problems.append("links.email does not look like an email address: %r" % url)
+        elif url and not url.startswith("https://"):
+            problems.append("links.%s should start with https:// (got %r)" % (key, url))
+    for folder, _, files in os.walk(DIST):
+        for name in files:
+            if not name.endswith(".html"):
+                continue
+            path = os.path.join(folder, name)
+            html = read_abs(path)
+            if "[[" in html:
+                problems.append("%s still contains an unfilled [[placeholder]]" % os.path.relpath(path, DIST))
+            for ref in set(re.findall(r'(?:href|src)="([^"#?]+)', html)):
+                if re.match(r"^(https?:|mailto:|tel:|data:|//)", ref):
+                    continue
+                target = os.path.join(DIST, ref.lstrip("/")) if ref.startswith("/") else os.path.normpath(os.path.join(folder, ref))
+                if not (os.path.isfile(target) or os.path.isfile(os.path.join(target, "index.html"))):
+                    problems.append("%s links to something that does not exist: %s" % (os.path.relpath(path, DIST), ref))
+    if problems:
+        raise SystemExit("NOT PUBLISHED. Please fix:\n- " + "\n- ".join(problems))
 
 
 def main():
     site = json.loads(read("content/site.json"))
-    global ENDPOINT
+    global ENDPOINT, BASE
     ENDPOINT = (site.get("automation", {}).get("endpoint", "") or "").strip()
     seo, links = site.get("seo", {}), site.get("links", {})
     base = (seo.get("site_url") or "").rstrip("/")
+    BASE = base
+    same_as = [links.get(k) for k in ("linkedin", "instagram", "substack", "linktree") if links.get(k)]
+    about = site.get("about", {})
+    person = {
+        "@context": "https://schema.org", "@type": "Person", "@id": (base or "") + "/#jess", "name": "Jess Cruse",
+        "url": (base or "") + "/", "image": (base or "") + "/assets/img/jess-radio.jpg",
+        "jobTitle": "Voice confidence coach, speaker and founder of Voxa",
+        "description": " ".join(about.get("paragraphs", [])[:1]) or seo.get("description", ""),
+        "email": "mailto:" + links.get("email", ""),
+        "worksFor": {"@type": "Organization", "name": "Voxa", "url": links.get("voxa", "")},
+        "knowsAbout": ["Voice confidence", "Public speaking", "Storytelling", "Pitch coaching", "Communication skills training"],
+        "sameAs": same_as,
+    }
+    website = {"@context": "https://schema.org", "@type": "WebSite", "name": "Jess Cruse", "url": (base or "") + "/", "inLanguage": "en-GB", "author": {"@id": (base or "") + "/#jess"}}
 
     if os.path.exists(DIST):
         shutil.rmtree(DIST)
@@ -315,7 +402,7 @@ def main():
     home = home.replace("[[ABOUT]]", about_html(site.get("about", {})))
     home = home.replace("[[SUBSTACK_LINK]]", more)
     home = fill(home, site, "")
-    write("index.html", page(seo.get("title", "Jess Cruse"), seo.get("description", ""), home, "", base + "/" if base else ""))
+    write("index.html", page(seo.get("title", "Jess Cruse"), seo.get("description", ""), home, "", base + "/" if base else "", data=[person, website]))
 
     post_tpl = read("templates/post.html")
     for p in posts:
@@ -325,22 +412,53 @@ def main():
         body = body.replace("[[POST_BODY]]", body_html(p["body"]))
         body = fill(body, site, "../../")
         canonical = "%s/blog/%s/" % (base, p["slug"]) if base else ""
-        write("blog/%s/index.html" % p["slug"], page(p["title"] + " | Jess Cruse", p["summary"], body, "../../", canonical))
+        article = {
+            "@context": "https://schema.org", "@type": "BlogPosting", "headline": p["title"], "description": p["summary"],
+            "datePublished": str(p["date"]), "dateModified": str(p["date"]), "inLanguage": "en-GB",
+            "author": {"@type": "Person", "name": "Jess Cruse", "url": (base or "") + "/"},
+            "mainEntityOfPage": canonical, "image": (base or "") + "/assets/img/share.jpg",
+        }
+        write("blog/%s/index.html" % p["slug"], page(p["title"] + " | Jess Cruse", p["summary"], body, "../../", canonical, kind="article", data=[article]))
 
     book = read("templates/book.html").replace("[[EXCERPT]]", excerpt_html(site.get("book", {}).get("excerpt", "")))
     book = fill(book, site, "../")
-    write("book/index.html", page("A Book About Voice | Jess Cruse", site.get("book", {}).get("blurb", ""), book, "../", base + "/book/" if base else ""))
+    book_info = site.get("book", {})
+    book_desc = "A Book About Voice by Jess Cruse: %s %s. Read more and pre-order your copy." % (book_info.get("blurb", "").replace(" I'm writing it now.", ""), book_info.get("release", ""))
+    book_data = {
+        "@context": "https://schema.org", "@type": "Book", "name": "A Book About Voice", "author": {"@type": "Person", "name": "Jess Cruse", "url": (base or "") + "/"},
+        "description": book_info.get("blurb", ""), "inLanguage": "en", "url": (base or "") + "/book/",
+    }
+    write("book/index.html", page("A Book About Voice | Jess Cruse", book_desc, book, "../", base + "/book/" if base else "", kind="book", data=[book_data]))
 
     privacy = fill(read("templates/privacy.html"), site, "../")
-    write("privacy/index.html", page("Privacy | Jess Cruse", "How this site handles your information.", privacy, "../"))
+    write("privacy/index.html", page("Privacy | Jess Cruse", "How jesscruse.com handles your information, in plain words: pre-orders, visit counting and other services.", privacy, "../", base + "/privacy/" if base else ""))
+    write("404.html", page("Page not found | Jess Cruse", "This page could not be found.", fill(read("templates/404.html"), site, "/"), "/", index=False))
 
     write(".nojekyll", "")
     if os.path.exists(os.path.join(ROOT, "CNAME")):
         shutil.copy(os.path.join(ROOT, "CNAME"), os.path.join(DIST, "CNAME"))
     if base:
-        urls = [base + "/"] + ["%s/blog/%s/" % (base, p["slug"]) for p in posts]
-        write("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % "".join("<url><loc>%s</loc></url>\n" % esc(u) for u in urls))
-        write("robots.txt", "User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n" % base)
+        today = time.strftime("%Y-%m-%d")
+        urls = [(base + "/", today), (base + "/book/", today)] + [("%s/blog/%s/" % (base, p["slug"]), str(p["date"])) for p in posts] + [(base + "/privacy/", today)]
+        write("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % "".join("<url><loc>%s</loc><lastmod>%s</lastmod></url>\n" % (esc(u), d) for u, d in urls))
+        write("robots.txt", "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % base)
+    # A plain summary for AI assistants and search tools, built only from what the site itself says.
+    lines = ["# Jess Cruse", "", "> " + seo.get("description", ""), "",
+             "Jess Cruse is a voice confidence coach, speaker and the founder of Voxa, a voice confidence app.", ""]
+    if about.get("paragraphs"):
+        lines += ['In her own words: "%s"' % about["paragraphs"][0], ""]
+    lines += ["## What Jess offers", "",
+              "- One to one voice confidence coaching. Book a discovery call: %s" % links.get("calendly", ""),
+              "- Team training in communication and speaking skills. Enquiries: %s" % links.get("email", ""),
+              "- Speaking: stages, panels, podcasts and workshops. Enquiries: %s" % links.get("email", ""),
+              "- Voxa, an app to practise speaking right now: %s" % links.get("voxa", ""),
+              "- A Book About Voice (%s), a practical and honest book about voice confidence. Pre-order: %s/book/" % (book_info.get("release", "").lower(), base), "",
+              "## Pages", "", "- Home: %s/" % base, "- The book: %s/book/" % base]
+    lines += ["- %s: %s/blog/%s/" % (p["title"], base, p["slug"]) for p in posts]
+    lines += ["- Privacy: %s/privacy/" % base, "", "## Elsewhere", ""]
+    lines += ["- %s: %s" % (k.capitalize(), links[k]) for k in ("linkedin", "instagram", "substack", "linktree") if links.get(k)]
+    write("llms.txt", "\n".join(lines) + "\n")
+    check(site)
     print("Built %d pages into dist/" % (3 + len(posts)))
 
 

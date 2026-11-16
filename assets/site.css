@@ -47,3 +47,8 @@ input:focus-visible{outline:3px solid #FFCE00;outline-offset:2px}
 .combo-list{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:20;margin:0;padding:8px;list-style:none;background:#FFFFFF;color:#2D2A3E;border-radius:20px;box-shadow:0 12px 32px rgba(0,0,0,.28);max-height:260px;overflow:auto}
 .combo-list li{padding:12px 16px;border-radius:14px;font-size:17px;font-weight:700;cursor:pointer}
 .combo-list li[aria-selected="true"],.combo-list li:hover{background:#FFCE00}
+
+.skip{position:absolute;left:-9999px;top:0;z-index:100;background:#2D2A3E;color:#FFFFFF;font-family:'Nunito',sans-serif;font-weight:800;padding:14px 20px;border-radius:0 0 16px 0}
+.skip:focus{left:0}
+.choice input:checked + span::before{content:"\2713\00a0"}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.tile,.lift,.row,.art{transition:none !important}}

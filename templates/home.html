@@ -2,7 +2,7 @@
 
 <header style="max-width: 1120px; margin: 0 auto; padding: 20px 32px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
 <a href="#top" style="font-size: 24px; font-weight: 900; text-decoration: none; display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 50%; background: #FFCE00; display: inline-block"></span>Jess Cruse</a>
-<nav style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; font-size: 16px; font-weight: 700">
+<nav aria-label="Main" style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; font-size: 16px; font-weight: 700">
 <a href="#blog" style="text-decoration: none; padding: 12px 0">Read</a>
 <a href="#book" style="text-decoration: none; padding: 12px 0">Book</a>
 <a href="#listen" style="text-decoration: none; padding: 12px 0">Listen</a>
@@ -12,6 +12,7 @@
 </nav>
 </header>
 
+<main id="main">
 <section id="top" style="position: relative; overflow: hidden; max-width: 1180px; margin: 0 auto; box-sizing: border-box; background: #FFF3C4; border-radius: 56px; padding: 64px 32px 56px; display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center">
 <div aria-hidden="true" class="floaty" style="position: absolute; left: -60px; top: 120px; width: 180px; height: 180px; border-radius: 50%; background: #FFB59A"></div>
 <div aria-hidden="true" class="floaty2" style="position: absolute; right: -40px; top: 60px; width: 120px; height: 120px; border-radius: 36px; background: #BFE8D4; transform: rotate(18deg)"></div>
@@ -114,6 +115,7 @@
 
 
 </div>
+<noscript><p style="margin: 24px 0 0; font-size: 18px; font-weight: 700">To get in touch, <a href="[[links.calendly]]">book a call</a> or email <a href="mailto:[[links.email]]">[[links.email]]</a>.</p></noscript>
 </section>
 
 <section id="blog" style="max-width: 1120px; margin: 0 auto; padding: 128px 32px 0; box-sizing: border-box">
@@ -188,6 +190,7 @@
 </div>
 </section>
 
+</main>
 <footer style="margin-top: 128px; background: #2D2A3E; color: #FFFFFF">
 <div style="max-width: 1120px; margin: 0 auto; padding: 64px 32px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 48px">
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px">
@@ -225,7 +228,7 @@
 <div class="modal" id="modal-me" hidden>
 <div class="fade" style="position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 50; background: rgba(45,42,62,0.6); display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box">
 <button aria-label="Close" type="button" data-close style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; border: 0; cursor: pointer"></button>
-<div class="pop" role="dialog" aria-label="Help me with my voice" style="position: relative; background: #FFFFFF; border-radius: 40px; padding: 44px 40px 40px; max-width: 480px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 12px 0 #F2B49A">
+<div class="pop" role="dialog" aria-modal="true" aria-label="Help me with my voice" style="position: relative; background: #FFFFFF; border-radius: 40px; padding: 44px 40px 40px; max-width: 480px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 12px 0 #F2B49A">
 <button aria-label="Close" type="button" data-close style="position: absolute; right: 20px; top: 20px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #F2F0F7; font: inherit; font-size: 20px; font-weight: 800; color: #2D2A3E; cursor: pointer">×</button>
 <span aria-hidden="true" style="width: 72px; height: 72px; border-radius: 50%; background: #FFD9C7"></span>
 <h2 style="margin: 0; font-size: 32px; line-height: 1.15; font-weight: 900">[[popups.me_title]]</h2>
@@ -239,7 +242,7 @@
 <div class="modal" id="modal-team" hidden>
 <div class="fade" style="position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 50; background: rgba(45,42,62,0.6); display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box">
 <button aria-label="Close" type="button" data-close style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; border: 0; cursor: pointer"></button>
-<div class="pop" role="dialog" aria-label="Help my team" style="position: relative; background: #FFFFFF; border-radius: 40px; padding: 44px 40px 40px; max-width: 480px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 12px 0 #A9D9BC">
+<div class="pop" role="dialog" aria-modal="true" aria-label="Help my team" style="position: relative; background: #FFFFFF; border-radius: 40px; padding: 44px 40px 40px; max-width: 480px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 12px 0 #A9D9BC">
 <button aria-label="Close" type="button" data-close style="position: absolute; right: 20px; top: 20px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #F2F0F7; font: inherit; font-size: 20px; font-weight: 800; color: #2D2A3E; cursor: pointer">×</button>
 <span aria-hidden="true" style="width: 72px; height: 72px; border-radius: 50%; background: #D5F0DF"></span>
 <h2 style="margin: 0; font-size: 32px; line-height: 1.15; font-weight: 900">[[popups.team_title]]</h2>
@@ -253,7 +256,7 @@
 <div class="modal" id="modal-speak" hidden>
 <div class="fade" style="position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 50; background: rgba(45,42,62,0.6); display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box">
 <button aria-label="Close" type="button" data-close style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; border: 0; cursor: pointer"></button>
-<div class="pop" role="dialog" aria-label="Speak here" style="position: relative; background: #FFFFFF; border-radius: 40px; padding: 44px 40px 40px; max-width: 480px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 12px 0 #A8C8F0">
+<div class="pop" role="dialog" aria-modal="true" aria-label="Speak here" style="position: relative; background: #FFFFFF; border-radius: 40px; padding: 44px 40px 40px; max-width: 480px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 12px 0 #A8C8F0">
 <button aria-label="Close" type="button" data-close style="position: absolute; right: 20px; top: 20px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #F2F0F7; font: inherit; font-size: 20px; font-weight: 800; color: #2D2A3E; cursor: pointer">×</button>
 <span aria-hidden="true" style="width: 72px; height: 72px; border-radius: 50%; background: #D6E8FF"></span>
 <h2 style="margin: 0; font-size: 32px; line-height: 1.15; font-weight: 900">[[popups.speak_title]]</h2>

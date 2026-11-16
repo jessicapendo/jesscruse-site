@@ -23,7 +23,16 @@
   });
 
   document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape') closeAll();
+    if (event.key === 'Escape') { closeAll(); return; }
+    if (event.key !== 'Tab') return;
+    var openModal = document.querySelector('.modal:not([hidden])');
+    if (!openModal) return;
+    var items = openModal.querySelectorAll('a[href], button:not([style*="opacity: 0"])');
+    if (!items.length) return;
+    var first = items[0], last = items[items.length - 1];
+    if (!openModal.contains(document.activeElement)) { event.preventDefault(); first.focus(); }
+    else if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   });
 })();
 
@@ -57,62 +66,51 @@
     }
 
     var endpoint = document.body.getAttribute('data-endpoint');
-    if (endpoint) {
-      var sendBtn = form.querySelector('button[type="submit"]');
-      sendBtn.disabled = true;
-      fetch(endpoint, {
-        method: 'POST',
-        body: JSON.stringify({
-          kind: 'preorder',
-          name: data.get('firstname'),
-          email: data.get('email'),
-          city: data.get('city'),
-          country: data.get('country'),
-          format: formats.map(function (f) { return formatLabels[f]; }).join(', '),
-          copies: data.get('copies'),
-          website: data.get('website') || ''
-        })
-      }).then(function (response) {
+    var key = form.getAttribute('data-key');
+    var formatText = formats.map(function (f) { return formatLabels[f]; }).join(', ');
+    var submitBtn = form.querySelector('button[type="submit"]');
+
+    function post(url, payload, headers, okField) {
+      return fetch(url, { method: 'POST', headers: headers || undefined, body: JSON.stringify(payload) }).then(function (response) {
         return response.json().catch(function () { return {}; }).then(function (body) {
-          if (!response.ok || body.ok === false) throw new Error(body.message || ('status ' + response.status));
-          if (window.jessTrack) window.jessTrack('Click', 'Pre-order sent');
-          done();
+          if (!response.ok || body[okField] === false) throw new Error(body.message || ('status ' + response.status));
         });
-      }).catch(function (err) {
-        sendBtn.disabled = false;
-        error.textContent = 'Sorry, that did not send. Please try again, or email ' + owner + '. (' + (err && err.message ? err.message : 'no connection') + ')';
-        error.hidden = false;
       });
-      return;
     }
 
-    var key = form.getAttribute('data-key');
-    if (key) {
+    function viaSheet() {
+      return post(endpoint, {
+        kind: 'preorder', name: data.get('firstname'), email: data.get('email'), city: data.get('city'),
+        country: data.get('country'), format: formatText, copies: data.get('copies'), website: data.get('website') || ''
+      }, null, 'ok');
+    }
+
+    function viaEmail() {
+      return post('https://api.web3forms.com/submit', {
+        access_key: key, subject: 'New pre-order: A Book About Voice', from_name: 'jesscruse.com',
+        Name: data.get('firstname'), email: data.get('email'), City: data.get('city'), Country: data.get('country'),
+        Format: formatText, Copies: data.get('copies')
+      }, { 'Content-Type': 'application/json', 'Accept': 'application/json' }, 'success');
+    }
+
+    if (endpoint || key) {
       if (data.get('website')) { done(); return; }
-      var btn = form.querySelector('button[type="submit"]');
-      btn.disabled = true;
-      fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          access_key: key,
-          subject: 'New pre-order: A Book About Voice',
-          from_name: 'jesscruse.com',
-          Name: data.get('firstname'),
-          email: data.get('email'),
-          City: data.get('city'),
-          Country: data.get('country'),
-          Format: formats.map(function (f) { return formatLabels[f]; }).join(', '),
-          Copies: data.get('copies')
-        })
-      }).then(function (response) {
-        return response.json().catch(function () { return {}; }).then(function (body) {
-          if (!response.ok || body.success === false) throw new Error(body.message || ('status ' + response.status));
-          done();
-        });
+      submitBtn.disabled = true;
+      // Try the main route first. If it fails, quietly try the backup so an order is never lost.
+      var attempt = endpoint ? viaSheet().catch(function (err) { if (key) return viaEmail(); throw err; }) : viaEmail();
+      attempt.then(function () {
+        if (window.jessTrack) window.jessTrack('Click', 'Pre-order sent');
+        done();
       }).catch(function (err) {
-        btn.disabled = false;
-        error.textContent = 'Sorry, that did not send. Please try again, or email ' + owner + '. (' + (err && err.message ? err.message : 'no connection') + ')';
+        submitBtn.disabled = false;
+        error.innerHTML = '';
+        error.appendChild(document.createTextNode('Sorry, that did not send. Please try again, or email '));
+        var mail = document.createElement('a');
+        mail.href = 'mailto:' + owner + '?subject=' + encodeURIComponent('Pre-order: A Book About Voice');
+        mail.textContent = owner;
+        mail.style.color = 'inherit';
+        error.appendChild(mail);
+        error.appendChild(document.createTextNode('. (' + (err && err.message ? err.message : 'no connection') + ')'));
         error.hidden = false;
       });
       return;
