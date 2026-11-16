@@ -56,6 +56,35 @@
       return;
     }
 
+    var key = form.getAttribute('data-key');
+    if (key) {
+      var btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: key,
+          subject: 'New pre-order: A Book About Voice',
+          from_name: 'jesscruse.com',
+          Name: data.get('firstname'),
+          email: data.get('email'),
+          City: data.get('city'),
+          Country: data.get('country'),
+          Format: formats.map(function (f) { return formatLabels[f]; }).join(', '),
+          Copies: data.get('copies')
+        })
+      }).then(function (response) {
+        if (!response.ok) throw new Error('status ' + response.status);
+        done();
+      }).catch(function () {
+        btn.disabled = false;
+        error.textContent = 'Sorry, that did not send. Please try again, or email ' + owner + '.';
+        error.hidden = false;
+      });
+      return;
+    }
+
     if (!portal || !formId) {
       var lines = [
         'Name: ' + data.get('firstname'),
