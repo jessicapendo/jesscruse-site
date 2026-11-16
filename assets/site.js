@@ -50,13 +50,20 @@
     var formId = form.getAttribute('data-form');
     var owner = form.getAttribute('data-email');
 
+    if (!formats.length) {
+      error.textContent = 'Please pick at least one format: physical copy, audiobook or PDF.';
+      error.hidden = false;
+      return;
+    }
+
     if (!portal || !formId) {
       var lines = [
         'Name: ' + data.get('firstname'),
         'Email: ' + data.get('email'),
         'City: ' + (data.get('city') || ''),
         'Country: ' + data.get('country'),
-        'Format: ' + formats.map(function (f) { return formatLabels[f]; }).join(', ')
+        'Format: ' + formats.map(function (f) { return formatLabels[f]; }).join(', '),
+        'Copies: ' + data.get('copies')
       ];
       window.location.href = 'mailto:' + owner + '?subject=' + encodeURIComponent('Pre-order: A Book About Voice') + '&body=' + encodeURIComponent(lines.join('\n'));
       return;
@@ -69,7 +76,8 @@
       { name: 'email', value: data.get('email') },
       { name: 'city', value: data.get('city') || '' },
       { name: 'country', value: data.get('country') },
-      { name: 'book_format_preference', value: formats.join(';') }
+      { name: 'book_format_preference', value: formats.join(';') },
+      { name: 'book_copies_wanted', value: data.get('copies') }
     ];
     fetch('https://api.hsforms.com/submissions/v3/integration/submit/' + portal + '/' + formId, {
       method: 'POST',

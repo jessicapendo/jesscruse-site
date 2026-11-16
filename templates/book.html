@@ -32,18 +32,20 @@
 <input name="email" type="email" required autocomplete="email" style="font: inherit; font-weight: 600; font-size: 18px; color: #2D2A3E; background: #FFFFFF; border: 0; border-radius: 20px; padding: 18px 22px"></label>
 <div style="display: flex; flex-wrap: wrap; gap: 20px">
 <label style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px; font-size: 16px; font-weight: 800">City
-<input name="city" type="text" autocomplete="address-level2" style="font: inherit; font-weight: 600; font-size: 18px; color: #2D2A3E; background: #FFFFFF; border: 0; border-radius: 20px; padding: 18px 22px"></label>
+<input name="city" type="text" required autocomplete="address-level2" style="font: inherit; font-weight: 600; font-size: 18px; color: #2D2A3E; background: #FFFFFF; border: 0; border-radius: 20px; padding: 18px 22px"></label>
 <label style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px; font-size: 16px; font-weight: 800">Country
 <input name="country" type="text" required autocomplete="country-name" style="font: inherit; font-weight: 600; font-size: 18px; color: #2D2A3E; background: #FFFFFF; border: 0; border-radius: 20px; padding: 18px 22px"></label>
 </div>
 <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
-<legend style="font-size: 16px; font-weight: 800; padding: 0 0 10px">How would you like to read it? Pick any.</legend>
+<legend style="font-size: 16px; font-weight: 800; padding: 0 0 10px">How would you like to read it? Pick at least one.</legend>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
 <label class="choice" style="position: relative; cursor: pointer"><input type="checkbox" name="format" value="physical_copy" style="position: absolute; opacity: 0"><span style="display: block; text-align: center; font-size: 17px; font-weight: 800; background: #3D3954; border: 3px solid #3D3954; border-radius: 22px; padding: 20px 12px">Physical copy</span></label>
 <label class="choice" style="position: relative; cursor: pointer"><input type="checkbox" name="format" value="audiobook" style="position: absolute; opacity: 0"><span style="display: block; text-align: center; font-size: 17px; font-weight: 800; background: #3D3954; border: 3px solid #3D3954; border-radius: 22px; padding: 20px 12px">Audiobook</span></label>
 <label class="choice" style="position: relative; cursor: pointer"><input type="checkbox" name="format" value="pdf" style="position: absolute; opacity: 0"><span style="display: block; text-align: center; font-size: 17px; font-weight: 800; background: #3D3954; border: 3px solid #3D3954; border-radius: 22px; padding: 20px 12px">PDF</span></label>
 </div>
 </fieldset>
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 16px; font-weight: 800">How many copies?
+<input name="copies" type="number" required min="1" max="999" step="1" value="1" inputmode="numeric" style="font: inherit; font-weight: 600; font-size: 18px; color: #2D2A3E; background: #FFFFFF; border: 0; border-radius: 20px; padding: 18px 22px; max-width: 180px"></label>
 <button type="submit" class="lift" style="margin-top: 8px; font: inherit; cursor: pointer; background: #FFCE00; color: #2D2A3E; border: 0; font-weight: 900; font-size: 19px; padding: 20px 32px; border-radius: 999px; box-shadow: 0 6px 0 #D9A900">Reserve my copy</button>
 <p id="preorder-error" role="alert" hidden style="margin: 0; font-size: 16px; font-weight: 700; color: #FFB59A"></p>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #D9D6E8; text-align: center">I'll only use your details to tell you about the book. <a href="[[ROOT]]privacy/" style="color: #D9D6E8">Privacy</a></p>
