@@ -224,9 +224,12 @@ def media_html(videos):
         cards.append(
             '<figure style="margin: 0; display: flex; flex-direction: column; gap: 12px">\n'
             '<div style="position: relative; padding-top: 56.25%%; border-radius: 28px; overflow: hidden; background: #14121D">'
-            '<iframe src="https://www.youtube-nocookie.com/embed/%s" title="%s" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture; web-share" allowfullscreen style="position: absolute; left: 0; top: 0; width: 100%%; height: 100%%; border: 0"></iframe></div>\n'
+            '<button type="button" class="yt" data-yt="%s" data-title="%s" aria-label="Play video: %s" style="position: absolute; left: 0; top: 0; width: 100%%; height: 100%%; padding: 0; border: 0; background: #14121D; cursor: pointer">'
+            '<img src="https://i.ytimg.com/vi/%s/hqdefault.jpg" alt="" loading="lazy" decoding="async" style="width: 100%%; height: 100%%; object-fit: cover; display: block">'
+            '<span aria-hidden="true" style="position: absolute; left: 50%%; top: 50%%; width: 76px; height: 76px; margin: -38px 0 0 -38px; border-radius: 50%%; background: #FFCE00; color: #2D2A3E; display: flex; align-items: center; justify-content: center; font-size: 30px; padding-left: 6px; box-sizing: border-box; box-shadow: 0 6px 0 rgba(0,0,0,.35)">&#9654;</span>'
+            '</button></div>\n'
             '<figcaption style="font-size: 19px; font-weight: 800; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px">%s <a href="https://www.youtube.com/watch?v=%s" style="color: #FFCE00; font-size: 16px">Watch on YouTube</a></figcaption>\n'
-            "</figure>\n" % (vid, esc(v.get("title")), esc(v.get("title")), vid)
+            "</figure>\n" % (vid, esc(v.get("title")), esc(v.get("title")), vid, esc(v.get("title")), vid)
         )
     if not cards:
         return ""
@@ -316,16 +319,69 @@ def page(title, description, body, root, canonical="", endpoint=None, kind="webs
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="%sassets/site.css?v=7">
+<link rel="stylesheet" href="%sassets/site.css?v=8">
 </head>
 <body data-endpoint="%s">
 <a class="skip" href="#main">Skip to content</a>
 %s
-<script src="%sassets/site.js?v=7" defer></script>
+<script src="%sassets/site.js?v=8" defer></script>
 </body>
 </html>
 """ % (esc(CSP), esc(title), esc(description), esc(title), esc(description), kind, esc(share), esc(title), esc(description), esc(share),
        root, root, "\n".join(extra), root, esc(ENDPOINT if endpoint is None else endpoint), body, root)
+
+
+def shrink_images():
+    """Make a small, fast copy of every photo at the size it is actually shown, and point the pages at it."""
+    try:
+        from PIL import Image, ImageOps
+    except ImportError:
+        print("Pillow not installed: photos left at full size")
+        return
+    made = {}
+    for folder, _, files in os.walk(DIST):
+        for name in files:
+            if not name.endswith(".html"):
+                continue
+            path = os.path.join(folder, name)
+            page_html = read_abs(path)
+
+            def swap(m):
+                tag, src = m.group(0), m.group(1)
+                if src.startswith(("http", "data:")) or not re.search(r"\.(jpe?g|png)$", src, re.I):
+                    return tag
+                source = os.path.join(DIST, src.lstrip("/")) if src.startswith("/") else os.path.normpath(os.path.join(folder, src))
+                if not os.path.isfile(source):
+                    return tag
+                dims = [int(n) for n in re.findall(r'(?:width|height)="(\d+)"', tag)] or [int(n) for n in re.findall(r"(?:width|height): (\d+)px", tag)]
+                target = min(1400, max(dims) * 2) if dims else 1000
+                key = (source, target)
+                if key not in made:
+                    out = "%s-%d.webp" % (os.path.splitext(source)[0], target)
+                    try:
+                        im = ImageOps.exif_transpose(Image.open(source))
+                        im = im.convert("RGBA" if im.mode in ("RGBA", "LA", "P") else "RGB")
+                        im.thumbnail((target, target), Image.LANCZOS)
+                        im.save(out, "WEBP", quality=72, method=6)
+                        made[key] = out if os.path.getsize(out) < os.path.getsize(source) else None
+                    except Exception as err:
+                        print("Could not shrink %s: %s" % (src, err))
+                        made[key] = None
+                if not made[key]:
+                    return tag
+                new_src = "%s-%d.webp" % (os.path.splitext(src)[0], target)
+                return tag.replace('src="%s"' % src, 'src="%s"' % new_src, 1)
+
+            new_html = re.sub(r'<img [^>]*?src="([^"]+)"[^>]*>', swap, page_html)
+            hero = re.search(r'<img [^>]*fetchpriority="high"[^>]*src="([^"]+)"', new_html)
+            if hero:
+                new_html = re.sub(r'(<link rel="preload" as="image" href=")[^"]+(">)', lambda m: m.group(1) + hero.group(1) + m.group(2), new_html)
+            if new_html != page_html:
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(new_html)
+    for (source, _), out in made.items():
+        pass
+    print("Shrunk %d photos" % len([o for o in made.values() if o]))
 
 
 def check(site):
@@ -406,6 +462,11 @@ def main():
     home = home.replace("[[MEDIA]]", media_html(listen.get("videos", [])))
     home = home.replace("[[ABOUT]]", about_html(site.get("about", {})))
     home = home.replace("[[SUBSTACK_LINK]]", more)
+    note = esc(site.get("footer", {}).get("note", ""))
+    mail = esc(links.get("email", ""))
+    if note and mail:
+        note = note.replace(mail, '<a href="mailto:%s" style="color: #FFFFFF">%s</a>' % (mail, mail))
+    home = home.replace("[[FOOTER_NOTE]]", '<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #D9D6E8; max-width: 640px">%s</p>\n' % note if note else "")
     home = fill(home, site, "")
     write("index.html", page(seo.get("title", "Jess Cruse"), seo.get("description", ""), home, "", base + "/" if base else "", data=[person, website]))
 
@@ -463,6 +524,7 @@ def main():
     lines += ["- Privacy: %s/privacy/" % base, "", "## Elsewhere", ""]
     lines += ["- %s: %s" % (k.capitalize(), links[k]) for k in ("linkedin", "instagram", "substack", "linktree") if links.get(k)]
     write("llms.txt", "\n".join(lines) + "\n")
+    shrink_images()
     check(site)
     print("Built %d pages into dist/" % (3 + len(posts)))
 

@@ -270,3 +270,20 @@
     else if (e.key === 'Escape') { e.stopPropagation(); close(); }
   });
 })();
+
+/* Videos load only when someone presses play, so the page itself stays fast. */
+(function () {
+  var players = document.querySelectorAll('.yt[data-yt]');
+  for (var i = 0; i < players.length; i++) {
+    players[i].addEventListener('click', function () {
+      var frame = document.createElement('iframe');
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(this.getAttribute('data-yt')) + '?autoplay=1';
+      frame.title = this.getAttribute('data-title') || 'Video';
+      frame.allow = 'accelerometer; autoplay; encrypted-media; picture-in-picture; web-share';
+      frame.allowFullscreen = true;
+      frame.style.cssText = 'position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0';
+      this.parentNode.replaceChild(frame, this);
+      if (window.jessTrack) window.jessTrack('Click', 'Played a video');
+    });
+  }
+})();

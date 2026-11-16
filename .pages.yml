@@ -112,6 +112,7 @@ content:
         type: object
         fields:
           - { name: tagline, label: Short line under your name, type: string }
+          - { name: note, label: Small note at the very bottom, type: text }
       - name: seo
         label: Search and sharing
         type: object
