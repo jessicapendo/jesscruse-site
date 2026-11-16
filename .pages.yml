@@ -1,0 +1,120 @@
+# This file tells Pages CMS (app.pagescms.org) which parts of the site you can edit.
+media:
+  input: assets/uploads
+  output: assets/uploads
+content:
+  - name: site
+    label: Home page
+    type: file
+    path: content/site.json
+    fields:
+      - name: hero
+        label: Top of the page
+        type: object
+        fields:
+          - { name: title, label: Big headline, type: string }
+          - { name: subtitle, label: Line under the headline, type: text }
+          - { name: photo, label: Your photo in the sun, type: image }
+      - name: tiles
+        label: The five big buttons
+        type: object
+        fields:
+          - { name: me_lead, label: "Button 1, normal words", type: string }
+          - { name: me_bold, label: "Button 1, bold words", type: string }
+          - { name: team_lead, label: "Button 2, normal words", type: string }
+          - { name: team_bold, label: "Button 2, bold words", type: string }
+          - { name: start_lead, label: "Button 3, normal words", type: string }
+          - { name: start_bold, label: "Button 3, bold words", type: string }
+          - { name: read_lead, label: "Button 4, normal words", type: string }
+          - { name: read_bold, label: "Button 4, bold words", type: string }
+          - { name: book_lead, label: "Button 5, normal words", type: string }
+          - { name: book_bold, label: "Button 5, bold words", type: string }
+      - name: popups
+        label: Pop-up messages
+        type: object
+        fields:
+          - { name: me_title, label: "Help me pop-up, headline", type: string }
+          - { name: me_text, label: "Help me pop-up, text", type: text }
+          - { name: team_title, label: "Help my team pop-up, headline", type: string }
+          - { name: team_text, label: "Help my team pop-up, text", type: text }
+      - name: links
+        label: Links
+        type: object
+        fields:
+          - { name: voxa, label: Voxa app link, type: string }
+          - { name: calendly, label: Calendly booking link, type: string }
+          - { name: email, label: Your email address, type: string }
+          - { name: linktree, label: Linktree link, type: string }
+          - { name: instagram, label: Instagram link, type: string }
+          - { name: linkedin, label: LinkedIn link, type: string }
+          - { name: substack, label: "Substack link for the All my writing button", type: string }
+          - { name: substack_publication, label: "Substack publication address, like https://yourname.substack.com (fills the blog cards automatically; leave empty to show posts written here)", type: string }
+      - name: book
+        label: Book section
+        type: object
+        fields:
+          - { name: blurb, label: Text about the book, type: text }
+      - name: listen
+        label: Thoughts on voice section
+        type: object
+        fields:
+          - { name: heading, label: Heading, type: string }
+          - { name: photo, label: Photo, type: image }
+          - name: items
+            label: Things to listen to or watch
+            type: object
+            list: true
+            fields:
+              - { name: title, label: Button text, type: string }
+              - { name: kind, label: "Small label (Podcast, Video, Radio)", type: string }
+              - { name: url, label: Link, type: string }
+      - name: gallery
+        label: Gallery
+        type: object
+        fields:
+          - { name: heading, label: Heading, type: string }
+          - name: items
+            label: Polaroids
+            type: object
+            list: true
+            fields:
+              - { name: image, label: Photo (square works best), type: image }
+              - { name: caption, label: Handwritten caption, type: string }
+      - name: about
+        label: About me
+        type: object
+        fields:
+          - { name: heading, label: Big opening line, type: text }
+          - { name: paragraphs, label: Paragraphs, type: text, list: true }
+          - { name: highlight, label: Highlighted closing line, type: text }
+      - name: footer
+        label: Footer
+        type: object
+        fields:
+          - { name: tagline, label: Short line under your name, type: string }
+      - name: seo
+        label: Search and sharing
+        type: object
+        fields:
+          - { name: title, label: Title shown in Google and browser tabs, type: string }
+          - { name: description, label: Short description shown in Google, type: text }
+          - { name: site_url, label: "Your website address (for example https://jesscruse.com)", type: string }
+  - name: posts
+    label: Blog posts
+    type: collection
+    path: content/posts
+    filename: "{year}-{month}-{day}-{primary}.md"
+    view:
+      fields: [title, date]
+      primary: title
+      sort: [date]
+    fields:
+      - { name: title, label: Title, type: string }
+      - { name: date, label: Date, type: date }
+      - { name: summary, label: One sentence summary (shown in Google), type: text }
+      - name: cover
+        label: Cover style
+        type: select
+        options:
+          values: ["1", "2", "3"]
+      - { name: body, label: Post, type: rich-text }

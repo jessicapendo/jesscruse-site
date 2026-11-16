@@ -1,0 +1,173 @@
+{
+  "seo": {
+    "title": "Jess Cruse | Voice confidence coach, speaker and founder of Voxa",
+    "description": "I don't know you, but I know your voice matters. Voice confidence coaching, team training, speaking and writing from Jess Cruse, founder of Voxa.",
+    "site_url": ""
+  },
+  "hero": {
+    "title": "I don't know you, but I know your voice matters.",
+    "subtitle": "I know you were made on purpose, and I know the world is waiting to hear from you.",
+    "photo": "assets/img/jess-radio.jpg"
+  },
+  "tiles": {
+    "me_lead": "Help me with",
+    "me_bold": "my voice",
+    "team_lead": "Help my team with",
+    "team_bold": "their speaking skills",
+    "start_lead": "Start speaking",
+    "start_bold": "right now",
+    "read_lead": "Keep",
+    "read_bold": "reading",
+    "book_lead": "Dive",
+    "book_bold": "deeper"
+  },
+  "popups": {
+    "me_title": "Ready to improve your voice confidence?",
+    "me_text": "You can book a discovery call with me here.",
+    "team_title": "Improve your team's communication skills.",
+    "team_text": "Tell me about your people, or book a call and we'll talk it through."
+  },
+  "links": {
+    "voxa": "https://voxa.club",
+    "calendly": "https://calendly.com/jess-voxa",
+    "email": "jess@voxa.club",
+    "linktree": "https://linktr.ee/jesscruse",
+    "instagram": "https://instagram.com/livingstorieswithjess",
+    "linkedin": "https://linkedin.com/in/jesscruse",
+    "substack": "https://substack.com/@thecuriousstoryteller",
+    "substack_publication": ""
+  },
+  "book": {
+    "blurb": "A practical and honest book about voice confidence. I'm writing it now."
+  },
+  "listen": {
+    "heading": "Some of my thoughts on voice",
+    "photo": "assets/img/jess-listen.jpg",
+    "items": [
+      {
+        "title": "Listen on Spotify",
+        "kind": "Podcast episode",
+        "url": "https://open.spotify.com/episode/2pt8QZZfXwUC2aNyeN9gVR"
+      },
+      {
+        "title": "Watch the podcast interview",
+        "kind": "YouTube",
+        "url": "https://www.youtube.com/watch?v=7lrwWfa26EU"
+      },
+      {
+        "title": "Watch the radio interview",
+        "kind": "YouTube",
+        "url": "https://www.youtube.com/watch?v=ePumzAAWHV8"
+      }
+    ]
+  },
+  "gallery": {
+    "heading": "The journey so far",
+    "items": [
+      {
+        "image": "assets/img/g-award.jpg",
+        "caption": "AI startup award, Egypt 2026"
+      },
+      {
+        "image": "assets/img/p-doers.jpg",
+        "caption": "Doers Summit, Cyprus"
+      },
+      {
+        "image": "assets/img/g-recording.jpg",
+        "caption": "Recording content"
+      },
+      {
+        "image": "assets/img/g-leap.jpg",
+        "caption": "LEAP, Saudi Arabia"
+      },
+      {
+        "image": "assets/img/g-startupscene.jpg",
+        "caption": "Interviewed by Startup Scene MENA"
+      },
+      {
+        "image": "assets/img/jess-face.jpg",
+        "caption": "On stage, mid laugh"
+      },
+      {
+        "image": "assets/img/g-pitchcoach.jpg",
+        "caption": "Startup pitch coaching"
+      },
+      {
+        "image": "assets/img/g-dome.jpg",
+        "caption": "Hands up, everyone"
+      },
+      {
+        "image": "assets/img/g-radio.jpg",
+        "caption": "On the radio"
+      },
+      {
+        "image": "assets/img/p-coaching.jpg",
+        "caption": "Trying Voxa together"
+      },
+      {
+        "image": "assets/img/g-natwest.jpg",
+        "caption": "Pitching in the UK"
+      },
+      {
+        "image": "assets/img/g-blazer.jpg",
+        "caption": "Photoshoot for headshots"
+      },
+      {
+        "image": "assets/img/g-podcast.jpg",
+        "caption": "Engineers of Entrepreneurship podcast"
+      },
+      {
+        "image": "assets/img/g-workshop.jpg",
+        "caption": "Workshop days, Ghana"
+      },
+      {
+        "image": "assets/img/p-startup.jpg",
+        "caption": "StartUp Bahrain, 2026"
+      },
+      {
+        "image": "assets/img/g-egypt.jpg",
+        "caption": "Backstage in Egypt"
+      },
+      {
+        "image": "assets/img/g-online.jpg",
+        "caption": "Coaching online"
+      },
+      {
+        "image": "assets/img/g-bench.jpg",
+        "caption": "Listening first"
+      },
+      {
+        "image": "assets/img/jess-speaking.jpg",
+        "caption": "Panel conversations"
+      },
+      {
+        "image": "assets/img/g-brown.jpg",
+        "caption": "Just before speaking"
+      },
+      {
+        "image": "assets/img/g-kids.jpg",
+        "caption": "Where it began"
+      },
+      {
+        "image": "assets/img/g-plant.jpg",
+        "caption": "Office days"
+      },
+      {
+        "image": "assets/img/p-phone.jpg",
+        "caption": "Voxa in someone's hand"
+      }
+    ]
+  },
+  "about": {
+    "heading": "I'm Jess, and it took me a long time to find my voice. Now I've found it, I'm not going to let it go.",
+    "paragraphs": [
+      "I've worked with thousands of people around the world, from CEOs, founders and C-suite leaders to students, graduates, street children, refugees and asylum seekers. I care about voices from anywhere and everywhere.",
+      "My background is in human rights, children's rights and international development. I'm also a self-identified empath and a Pisces, for those of you into star signs.",
+      "I've learnt that voice is so much more than the things we say and how we say them. When we find our voice, nurture it and share it, the world changes, and our world changes too. We can connect with people, share stories, ideas and even solutions."
+    ],
+    "highlight": "I believe voice confidence is the great gift that unlocks our ability to achieve our goals and reach our dreams."
+  },
+  "footer": {
+    "tagline": "Your voice matters. The world is waiting to hear from you."
+  }
+}
