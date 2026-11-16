@@ -179,5 +179,8 @@
   },
   "footer": {
     "tagline": "Your voice matters. The world is waiting to hear from you."
+  },
+  "automation": {
+    "endpoint": ""
   }
 }

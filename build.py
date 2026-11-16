@@ -247,7 +247,10 @@ def about_html(about):
     return "".join(out)
 
 
-def page(title, description, body, root, canonical=""):
+ENDPOINT = ""
+
+
+def page(title, description, body, root, canonical="", endpoint=None):
     head_extra = '<link rel="canonical" href="%s">\n' % esc(canonical) if canonical else ""
     return """<!doctype html>
 <html lang="en">
@@ -263,18 +266,20 @@ def page(title, description, body, root, canonical=""):
 %s<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="%sassets/site.css?v=4">
+<link rel="stylesheet" href="%sassets/site.css?v=5">
 </head>
-<body>
+<body data-endpoint="%s">
 %s
-<script src="%sassets/site.js?v=4" defer></script>
+<script src="%sassets/site.js?v=5" defer></script>
 </body>
 </html>
-""" % (esc(title), esc(description), esc(title), esc(description), root, head_extra, root, body, root)
+""" % (esc(title), esc(description), esc(title), esc(description), root, head_extra, root, esc(ENDPOINT if endpoint is None else endpoint), body, root)
 
 
 def main():
     site = json.loads(read("content/site.json"))
+    global ENDPOINT
+    ENDPOINT = (site.get("automation", {}).get("endpoint", "") or "").strip()
     seo, links = site.get("seo", {}), site.get("links", {})
     base = (seo.get("site_url") or "").rstrip("/")
 

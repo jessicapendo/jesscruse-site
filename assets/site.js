@@ -56,8 +56,39 @@
       return;
     }
 
+    var endpoint = document.body.getAttribute('data-endpoint');
+    if (endpoint) {
+      var sendBtn = form.querySelector('button[type="submit"]');
+      sendBtn.disabled = true;
+      fetch(endpoint, {
+        method: 'POST',
+        body: JSON.stringify({
+          kind: 'preorder',
+          name: data.get('firstname'),
+          email: data.get('email'),
+          city: data.get('city'),
+          country: data.get('country'),
+          format: formats.map(function (f) { return formatLabels[f]; }).join(', '),
+          copies: data.get('copies'),
+          website: data.get('website') || ''
+        })
+      }).then(function (response) {
+        return response.json().catch(function () { return {}; }).then(function (body) {
+          if (!response.ok || body.ok === false) throw new Error(body.message || ('status ' + response.status));
+          if (window.jessTrack) window.jessTrack('Click', 'Pre-order sent');
+          done();
+        });
+      }).catch(function (err) {
+        sendBtn.disabled = false;
+        error.textContent = 'Sorry, that did not send. Please try again, or email ' + owner + '. (' + (err && err.message ? err.message : 'no connection') + ')';
+        error.hidden = false;
+      });
+      return;
+    }
+
     var key = form.getAttribute('data-key');
     if (key) {
+      if (data.get('website')) { done(); return; }
       var btn = form.querySelector('button[type="submit"]');
       btn.disabled = true;
       fetch('https://api.web3forms.com/submit', {
@@ -134,4 +165,50 @@
       links[i].rel = 'noopener';
     }
   }
+})();
+
+/* Count visits and clicks. No cookies, nothing stored on the visitor's device, no personal details. */
+(function () {
+  var endpoint = document.body.getAttribute('data-endpoint');
+  if (!endpoint) return;
+  var page = window.location.pathname.replace(/\/index\.html$/, '/') || '/';
+
+  function send(type, label, source) {
+    var payload = JSON.stringify({ kind: 'event', type: type, label: label || '', page: page, source: source || '' });
+    try {
+      if (navigator.sendBeacon && navigator.sendBeacon(endpoint, payload)) return;
+    } catch (e) {}
+    try { fetch(endpoint, { method: 'POST', body: payload, keepalive: true, mode: 'no-cors' }); } catch (e) {}
+  }
+  window.jessTrack = send;
+
+  var from = '';
+  try { from = document.referrer ? new URL(document.referrer).hostname.replace(/^www\./, '') : ''; } catch (e) {}
+  var own = window.location.hostname.replace(/^www\./, '');
+  if (from && from === own) send('Page view', '');
+  else send('Visit', '', from);
+
+  var openers = { me: 'Help me with my voice', team: 'Help my team', speak: 'Speak here' };
+
+  document.addEventListener('click', function (event) {
+    var opener = event.target.closest('[data-open]');
+    if (opener) { send('Click', openers[opener.getAttribute('data-open')] || 'Pop-up'); return; }
+    var link = event.target.closest('a[href]');
+    if (!link) return;
+    var href = link.getAttribute('href') || '';
+    if (href.indexOf('mailto:') === 0) { send('Click', 'Email Jess'); return; }
+    if (href === '#blog') { send('Click', 'Keep reading'); return; }
+    if (href === '#book') { send('Click', 'Dive deeper'); return; }
+    if (/(^|\/)book\/(#preorder)?$/.test(href)) { send('Click', 'Book page'); return; }
+    if (href.indexOf('http') !== 0 || link.hostname === window.location.hostname) return;
+    var host = link.hostname.replace(/^www\./, '');
+    var names = [
+      ['calendly.com', 'Book a call'], ['voxa.club', 'Voxa app'], ['linktr.ee', 'Linktree'],
+      ['instagram.com', 'Instagram'], ['linkedin.com', 'LinkedIn'], ['substack.com', 'Substack'],
+      ['youtube', 'YouTube'], ['youtu.be', 'YouTube'], ['spotify.com', 'Spotify']
+    ];
+    var label = host;
+    for (var i = 0; i < names.length; i++) if (host.indexOf(names[i][0]) !== -1) { label = names[i][1]; break; }
+    send('Click', label);
+  }, true);
 })();
