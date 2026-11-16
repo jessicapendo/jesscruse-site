@@ -35,7 +35,7 @@
 <label style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px; font-size: 16px; font-weight: 800">City
 <input name="city" type="text" required autocomplete="address-level2" style="font: inherit; font-weight: 600; font-size: 18px; color: #2D2A3E; background: #FFFFFF; border: 0; border-radius: 20px; padding: 18px 22px"></label>
 <label style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px; font-size: 16px; font-weight: 800">Country
-<input name="country" type="text" required autocomplete="country-name" style="font: inherit; font-weight: 600; font-size: 18px; color: #2D2A3E; background: #FFFFFF; border: 0; border-radius: 20px; padding: 18px 22px"></label>
+<span class="combo"><input name="country" type="text" required autocomplete="off" id="country-input" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="country-list" style="font: inherit; font-weight: 600; font-size: 18px; color: #2D2A3E; background: #FFFFFF; border: 0; border-radius: 20px; padding: 18px 22px; width: 100%; box-sizing: border-box"><ul id="country-list" class="combo-list" role="listbox" hidden></ul></span></label>
 </div>
 <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
 <legend style="font-size: 16px; font-weight: 800; padding: 0 0 10px">How would you like to read it? Pick at least one.</legend>

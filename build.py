@@ -251,6 +251,12 @@ ENDPOINT = ""
 
 
 def page(title, description, body, root, canonical="", endpoint=None):
+    def lazy(m):
+        tag = m.group(0)
+        if "jess-radio" in tag or "loading=" in tag:
+            return tag.replace("<img ", '<img fetchpriority="high" ', 1) if "jess-radio" in tag else tag
+        return tag.replace("<img ", '<img loading="lazy" decoding="async" ', 1)
+    body = re.sub(r"<img [^>]*>", lazy, body)
     head_extra = '<link rel="canonical" href="%s">\n' % esc(canonical) if canonical else ""
     return """<!doctype html>
 <html lang="en">
@@ -266,11 +272,11 @@ def page(title, description, body, root, canonical="", endpoint=None):
 %s<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="%sassets/site.css?v=5">
+<link rel="stylesheet" href="%sassets/site.css?v=6">
 </head>
 <body data-endpoint="%s">
 %s
-<script src="%sassets/site.js?v=5" defer></script>
+<script src="%sassets/site.js?v=6" defer></script>
 </body>
 </html>
 """ % (esc(title), esc(description), esc(title), esc(description), root, head_extra, root, esc(ENDPOINT if endpoint is None else endpoint), body, root)

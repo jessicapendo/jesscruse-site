@@ -212,3 +212,63 @@
     send('Click', label);
   }, true);
 })();
+
+/* Country suggestions on the pre-order form: appear after three letters. */
+(function () {
+  var input = document.getElementById('country-input');
+  var list = document.getElementById('country-list');
+  if (!input || !list) return;
+  var countries = ['Algeria', 'Argentina', 'Australia', 'Austria', 'Bahrain', 'Bangladesh', 'Belgium', 'Botswana', 'Brazil', 'Cameroon', 'Canada', 'Chile', 'China', 'Colombia', 'Cyprus', 'Czechia', 'Denmark', 'Egypt', 'Ethiopia', 'Finland', 'France', 'Germany', 'Ghana', 'Greece', 'Hong Kong', 'Hungary', 'India', 'Indonesia', 'Iraq', 'Ireland', 'Italy', 'Ivory Coast', 'Jamaica', 'Japan', 'Jordan', 'Kenya', 'Kuwait', 'Lebanon', 'Libya', 'Malaysia', 'Mauritius', 'Mexico', 'Morocco', 'Mozambique', 'Namibia', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Oman', 'Pakistan', 'Palestine', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania', 'Rwanda', 'Saudi Arabia', 'Senegal', 'Singapore', 'South Africa', 'South Korea', 'Spain', 'Sri Lanka', 'Sudan', 'Sweden', 'Switzerland', 'Tanzania', 'Thailand', 'Tunisia', 'Turkey', 'Uganda', 'United Arab Emirates', 'United Kingdom', 'United States', 'Vietnam', 'Zambia', 'Zimbabwe'];
+  var alias = { 'uae': 'United Arab Emirates', 'usa': 'United States', 'america': 'United States', 'england': 'United Kingdom', 'scotland': 'United Kingdom', 'wales': 'United Kingdom', 'britain': 'United Kingdom', 'great britain': 'United Kingdom', 'ksa': 'Saudi Arabia', 'holland': 'Netherlands', 'emirates': 'United Arab Emirates', 'dubai': 'United Arab Emirates' };
+  var active = -1;
+
+  function close() { list.hidden = true; list.innerHTML = ''; active = -1; input.setAttribute('aria-expanded', 'false'); }
+
+  function pick(name) { input.value = name; close(); }
+
+  function show() {
+    var q = input.value.trim().toLowerCase();
+    if (q.length < 3) { close(); return; }
+    var starts = [], contains = [];
+    countries.forEach(function (c) {
+      var i = c.toLowerCase().indexOf(q);
+      if (i === 0) starts.push(c); else if (i > 0) contains.push(c);
+    });
+    Object.keys(alias).forEach(function (a) {
+      if (a.indexOf(q) === 0 && starts.indexOf(alias[a]) === -1 && contains.indexOf(alias[a]) === -1) starts.push(alias[a]);
+    });
+    var matches = starts.concat(contains).slice(0, 8);
+    if (!matches.length || (matches.length === 1 && matches[0].toLowerCase() === q)) { close(); return; }
+    list.innerHTML = '';
+    matches.forEach(function (name, i) {
+      var li = document.createElement('li');
+      li.setAttribute('role', 'option');
+      li.id = 'country-option-' + i;
+      li.textContent = name;
+      li.addEventListener('mousedown', function (e) { e.preventDefault(); pick(name); });
+      list.appendChild(li);
+    });
+    active = -1;
+    list.hidden = false;
+    input.setAttribute('aria-expanded', 'true');
+  }
+
+  function mark(i) {
+    var items = list.children;
+    if (!items.length) return;
+    active = (i + items.length) % items.length;
+    for (var n = 0; n < items.length; n++) items[n].setAttribute('aria-selected', n === active ? 'true' : 'false');
+    input.setAttribute('aria-activedescendant', items[active].id);
+    items[active].scrollIntoView({ block: 'nearest' });
+  }
+
+  input.addEventListener('input', show);
+  input.addEventListener('blur', function () { setTimeout(close, 120); });
+  input.addEventListener('keydown', function (e) {
+    if (list.hidden) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); mark(active + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); mark(active - 1); }
+    else if (e.key === 'Enter' && active > -1) { e.preventDefault(); pick(list.children[active].textContent); }
+    else if (e.key === 'Escape') { e.stopPropagation(); close(); }
+  });
+})();
