@@ -257,11 +257,13 @@ def about_html(about):
 
 ENDPOINT = ""
 BASE = ""
+PH_KEY = ""
+PH_HOST = ""
 
-CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+CSP = ("default-src 'self'; script-src 'self' https://*.posthog.com; worker-src 'self' blob: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
        "font-src https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self' https:; "
        "frame-src https://www.youtube-nocookie.com; "
-       "connect-src 'self' https://api.web3forms.com https://script.google.com https://script.googleusercontent.com https://api.hsforms.com; "
+       "connect-src 'self' https://api.web3forms.com https://script.google.com https://script.googleusercontent.com https://api.hsforms.com https://*.posthog.com; "
        "form-action 'self' https://api.web3forms.com; base-uri 'self'; object-src 'none'")
 
 
@@ -319,16 +321,16 @@ def page(title, description, body, root, canonical="", endpoint=None, kind="webs
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="%sassets/site.css?v=9">
+<link rel="stylesheet" href="%sassets/site.css?v=10">
 </head>
-<body data-endpoint="%s">
+<body data-endpoint="%s" data-ph-key="%s" data-ph-host="%s">
 <a class="skip" href="#main">Skip to content</a>
 %s
-<script src="%sassets/site.js?v=9" defer></script>
+<script src="%sassets/site.js?v=10" defer></script>
 </body>
 </html>
 """ % (esc(CSP), esc(title), esc(description), esc(title), esc(description), kind, esc(share), esc(title), esc(description), esc(share),
-       root, root, "\n".join(extra), root, esc(ENDPOINT if endpoint is None else endpoint), body, root)
+       root, root, "\n".join(extra), root, esc(ENDPOINT if endpoint is None else endpoint), esc(PH_KEY), esc(PH_HOST), body, root)
 
 
 def shrink_images():
@@ -418,8 +420,10 @@ def main():
         for key, value in values.items():
             if not site.setdefault(section, {}).get(key):
                 site[section][key] = value
-    global ENDPOINT, BASE
+    global ENDPOINT, BASE, PH_KEY, PH_HOST
     ENDPOINT = (site.get("automation", {}).get("endpoint", "") or "").strip()
+    PH_KEY = (site.get("analytics", {}).get("posthog_key", "") or "").strip()
+    PH_HOST = (site.get("analytics", {}).get("posthog_host", "") or "https://eu.i.posthog.com").strip().rstrip("/")
     seo, links = site.get("seo", {}), site.get("links", {})
     base = (seo.get("site_url") or "").rstrip("/")
     BASE = base

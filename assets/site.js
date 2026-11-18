@@ -168,7 +168,9 @@
 /* Count visits and clicks. No cookies, nothing stored on the visitor's device, no personal details. */
 (function () {
   var endpoint = document.body.getAttribute('data-endpoint');
-  if (!endpoint) return;
+  var phKey = document.body.getAttribute('data-ph-key');
+  var phHost = document.body.getAttribute('data-ph-host') || 'https://eu.i.posthog.com';
+  if (!endpoint && !phKey) return;
   // The owner can open the site once with ?me at the end of the address so her own visits are not counted on that device.
   try {
     if (/[?&]me\b/.test(window.location.search)) { window.localStorage.setItem('owner', '1'); window.alert('Done. Your own visits on this device will no longer be counted.'); }
@@ -177,7 +179,32 @@
   } catch (e) {}
   var page = window.location.pathname.replace(/\/index\.html$/, '/') || '/';
 
+  // PostHog: the visual analytics dashboard. No cookies and nothing stored on the visitor's device.
+  var ph = null;
+  if (phKey) {
+    ph = window.posthog = window.posthog || [];
+    if (!ph.__SV) {
+      ph._i = [];
+      ph.capture = function () { ph.push(['capture'].concat(Array.prototype.slice.call(arguments))); };
+      ph._i.push([phKey, {
+        api_host: phHost,
+        defaults: '2026-01-30',
+        persistence: 'memory',
+        person_profiles: 'identified_only',
+        disable_session_recording: true
+      }]);
+      ph.__SV = 1;
+      var tag = document.createElement('script');
+      tag.async = true;
+      tag.crossOrigin = 'anonymous';
+      tag.src = phHost.replace('.i.posthog.com', '-assets.i.posthog.com') + '/static/array.js';
+      document.head.appendChild(tag);
+    }
+  }
+
   function send(type, label, source) {
+    if (ph && type === 'Click') { try { window.posthog.capture(label, { page: page }); } catch (e) {} }
+    if (!endpoint) return;
     var payload = JSON.stringify({ kind: 'event', type: type, label: label || '', page: page, source: source || '' });
     try {
       if (navigator.sendBeacon && navigator.sendBeacon(endpoint, payload)) return;
